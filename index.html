@@ -1,0 +1,424 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cyrus Ameri</title>
+<meta name="description" content="Cyrus Ameri. Honolulu, Hawaii. Building Copia.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&display=swap" rel="stylesheet">
+<!--
+  Unfinished things carry class="todo" (the wavy blue underline).
+  Replace the text, drop the class. To keep the page current, rewrite
+  the one line under the name and the date above it.
+-->
+<style>
+:root {
+  --concrete: #F0F0EB;
+  --carbon: #111111;
+  --ash: #5B5B57;
+  --pen: #1E40C8;
+}
+
+* { box-sizing: border-box; }
+
+html {
+  background: var(--concrete);
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  scroll-behavior: auto;
+}
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
+}
+
+body {
+  margin: 0;
+  background: var(--concrete);
+  color: var(--carbon);
+  font-family: Archivo, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-synthesis: none;
+  font-stretch: 100%;
+  font-weight: 400;
+  font-size: 17px;
+  line-height: 1.5;
+}
+@media (min-width: 720px) {
+  body { font-size: 18px; }
+}
+
+::selection {
+  background: var(--pen);
+  color: var(--concrete);
+}
+
+.sheet {
+  max-width: 1440px;
+  margin: 0;
+  padding: 20px 16px 40px;
+}
+@media (min-width: 840px) {
+  .sheet { padding: 32px 48px 72px; }
+}
+
+p, h1, h2, h3, ul, table { margin: 0; }
+strong { font-weight: 700; }
+
+/* The four cuts. 15 / 18 / 30 / 172. */
+
+.meta {
+  font-stretch: 62%;
+  font-weight: 500;
+  font-size: 15px;
+  line-height: 1.35;
+  color: var(--ash);
+}
+
+.lede {
+  font-stretch: 100%;
+  font-weight: 500;
+  font-size: clamp(22px, 2.2vw, 30px);
+  line-height: 1.3;
+  max-width: 26em;
+}
+
+.body {
+  max-width: 62ch;
+}
+
+.display {
+  font-stretch: 125%;
+  font-weight: 900;
+  font-size: 21vw;
+  font-size: min(21vw, 120px);
+  line-height: 0.88;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+@media (min-width: 840px) {
+  .display {
+    font-size: 11.2vw;
+    font-size: min(11.2vw, 172px);
+  }
+}
+
+/* Links. Hover is an instant invert. */
+
+a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.16em;
+}
+a:hover,
+a:active {
+  background: var(--carbon);
+  color: var(--concrete);
+  text-decoration: none;
+}
+a:focus-visible {
+  background: var(--carbon);
+  color: var(--concrete);
+  text-decoration: none;
+  outline: 3px solid var(--carbon);
+  outline-offset: 3px;
+}
+
+/* The one mark for anything not written yet. */
+
+.todo {
+  text-decoration-line: underline;
+  text-decoration-style: wavy;
+  text-decoration-color: var(--pen);
+  text-decoration-thickness: 0.07em;
+  text-underline-offset: 0.2em;
+  text-decoration-skip-ink: none;
+}
+
+/* Top line */
+
+.topline {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  column-gap: 32px;
+  row-gap: 6px;
+}
+.topline nav {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 24px;
+  row-gap: 6px;
+}
+
+/* Rules. Each big word hangs from one. */
+
+.masthead,
+section,
+footer {
+  border-top: 4px solid var(--carbon);
+}
+.masthead {
+  margin-top: 24px;
+}
+section,
+footer {
+  margin-top: clamp(72px, 10vw, 144px);
+  scroll-margin-top: 16px;
+}
+section > .display + * {
+  margin-top: clamp(24px, 3vw, 40px);
+}
+
+/* Name block */
+
+.stamp {
+  margin-top: clamp(32px, 4vw, 56px);
+}
+.stamp + .lede {
+  margin-top: 10px;
+}
+.who {
+  margin-top: 24px;
+}
+
+/* Now */
+
+.ledger {
+  list-style: none;
+  padding: 0;
+}
+.ledger li {
+  padding: 14px 0;
+  border-bottom: 2px solid var(--carbon);
+}
+
+/* Made */
+
+.made {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+.made th,
+.made td {
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 2px solid var(--carbon);
+  padding: 14px 24px 14px 0;
+}
+.made th {
+  font-stretch: 62%;
+  font-weight: 500;
+  font-size: 15px;
+  line-height: 1.35;
+  color: var(--ash);
+  vertical-align: bottom;
+  padding: 0 24px 10px 0;
+}
+.made th:last-child,
+.made td:last-child {
+  padding-right: 0;
+}
+.made .name {
+  font-weight: 700;
+}
+.made .status {
+  font-stretch: 62%;
+  font-weight: 500;
+  font-size: 15px;
+  line-height: 1.35;
+  color: var(--ash);
+  padding-top: 16px;
+}
+.made .where {
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 719.98px) {
+  .made thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    border: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .made,
+  .made tbody,
+  .made tr,
+  .made td {
+    display: block;
+  }
+  .made tr {
+    padding: 14px 0;
+    border-bottom: 2px solid var(--carbon);
+  }
+  .made td {
+    padding: 0;
+    border: 0;
+  }
+  .made .status {
+    padding-top: 6px;
+  }
+  .made .where {
+    padding-top: 4px;
+  }
+}
+
+/* Notes */
+
+.note {
+  padding: 18px 0 22px;
+  border-bottom: 2px solid var(--carbon);
+}
+.note h3 {
+  font-stretch: 100%;
+  font-weight: 700;
+  font-size: clamp(22px, 2.2vw, 30px);
+  line-height: 1.3;
+  max-width: 26em;
+  text-wrap: balance;
+}
+.stub {
+  margin-top: 8px;
+  max-width: 62ch;
+  color: var(--ash);
+}
+
+/* Reach */
+
+.contact {
+  overflow-wrap: anywhere;
+}
+.contact a {
+  text-decoration-thickness: 3px;
+  text-underline-offset: 0.12em;
+}
+.contact + .meta {
+  margin-top: 14px;
+}
+
+/* Footer */
+
+footer {
+  padding-top: 14px;
+}
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <header class="topline meta">
+    <p>Cyrus Ameri, Honolulu, Hawaii</p>
+    <nav aria-label="Index">
+      <a href="#now">Now</a>
+      <a href="#made">Made</a>
+      <a href="#notes">Notes</a>
+      <a href="#reach">Reach</a>
+    </nav>
+  </header>
+
+  <div class="masthead">
+    <h1 class="display">Cyrus Ameri</h1>
+    <p class="meta stamp">Updated September 2026</p>
+    <p class="lede">Building Copia. Most of it myself, with AI agents and a small team.</p>
+    <p class="body who">Copia is AI that generates ads and landing pages for direct-to-consumer brands. I founded it and run it. I also run Holy Shilajit, a shilajit shots and resin brand. I live in Honolulu, Hawaii.</p>
+  </div>
+
+  <section id="now" aria-labelledby="now-heading">
+    <h2 class="display" id="now-heading">Now</h2>
+    <ul class="ledger">
+      <li><strong>Copia.</strong> Building the product. Ads and landing pages for direct-to-consumer brands.</li>
+      <li><strong>Holy Shilajit.</strong> Running the brand. Shilajit shots and resin.</li>
+      <li><strong>The Monetization Group.</strong> Winding it down into a few real content sites.</li>
+      <li><strong>Side projects.</strong> A breath-training game, still a concept. Music videos for product launches.</li>
+    </ul>
+  </section>
+
+  <section id="made" aria-labelledby="made-heading">
+    <h2 class="display" id="made-heading">Made</h2>
+    <table class="made" role="table" aria-labelledby="made-heading">
+      <colgroup>
+        <col style="width: 22%">
+        <col style="width: 42%">
+        <col style="width: 16%">
+        <col style="width: 20%">
+      </colgroup>
+      <thead role="rowgroup">
+        <tr role="row">
+          <th role="columnheader" scope="col">Name</th>
+          <th role="columnheader" scope="col">What it is</th>
+          <th role="columnheader" scope="col">Status</th>
+          <th role="columnheader" scope="col">Where</th>
+        </tr>
+      </thead>
+      <tbody role="rowgroup">
+        <tr role="row">
+          <td role="cell" class="name">Copia</td>
+          <td role="cell">AI that generates ads and landing pages for direct-to-consumer brands.</td>
+          <td role="cell" class="status">Building</td>
+          <td role="cell" class="where"><a href="https://copia.co">copia.co</a></td>
+        </tr>
+        <tr role="row">
+          <td role="cell" class="name">Holy Shilajit</td>
+          <td role="cell">Shilajit shots and resin.</td>
+          <td role="cell" class="status">Running</td>
+          <td role="cell" class="where"><a href="https://holyshilajit.com">holyshilajit.com</a></td>
+        </tr>
+        <tr role="row">
+          <td role="cell" class="name">The Monetization Group</td>
+          <td role="cell">A portfolio of affiliate review sites.</td>
+          <td role="cell" class="status">Winding down into a few real content sites</td>
+          <td role="cell" class="where"><a href="https://theconsumerpulse.com">theconsumerpulse.com</a>, <a href="https://shilajitreviews.com">shilajitreviews.com</a>, <a href="https://dogfoodsranked.com">dogfoodsranked.com</a>, <a href="https://topratedsunglasses.com">topratedsunglasses.com</a></td>
+        </tr>
+        <tr role="row">
+          <td role="cell" class="name">Breath-training game</td>
+          <td role="cell">A game that trains your breathing.</td>
+          <td role="cell" class="status">Concept</td>
+          <td role="cell" class="where">Nowhere yet.</td>
+        </tr>
+        <tr role="row">
+          <td role="cell" class="name">Music videos</td>
+          <td role="cell">For product launches.</td>
+          <td role="cell" class="status">Side project</td>
+          <td role="cell" class="where"><span class="todo">[link]</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="notes" aria-labelledby="notes-heading">
+    <h2 class="display" id="notes-heading">Notes</h2>
+    <article class="note">
+      <h3>Building most of the product with agents</h3>
+      <p class="stub todo">Draft. Cyrus rewrites this. Outline: what the agents do, what the team does, what I do.</p>
+    </article>
+    <article class="note">
+      <h3>Winding down the affiliate sites</h3>
+      <p class="stub todo">Draft. Cyrus rewrites this. Outline: what The Monetization Group was, what a real content site is, which sites stay.</p>
+    </article>
+    <article class="note">
+      <h3>A game you play by breathing</h3>
+      <p class="stub todo">Draft. Cyrus rewrites this. Outline: the concept, how breath becomes input, what to build first.</p>
+    </article>
+  </section>
+
+  <section id="reach" aria-labelledby="reach-heading">
+    <h2 class="display" id="reach-heading">Reach</h2>
+    <p class="lede contact"><span class="todo">[contact link]</span></p>
+    <p class="meta">Honolulu, Hawaii (UTC-10)</p>
+  </section>
+
+  <footer class="meta">
+    <p>Cyrus Ameri, Honolulu, Hawaii, 2026. One HTML file and one font. No scripts, no tracking.</p>
+  </footer>
+
+</div>
+</body>
+</html>
