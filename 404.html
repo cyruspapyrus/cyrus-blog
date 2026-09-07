@@ -4,14 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Cyrus Ameri</title>
-<meta name="description" content="Cyrus Ameri. Honolulu, Hawaii. Building Copia.">
+<meta name="description" content="Cyrus Ameri. Honolulu, Hawaii. Building Copia. Shoot the cargo, make the board.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&display=swap" rel="stylesheet">
 <!--
   Unfinished things carry class="todo" (the wavy blue underline).
-  Replace the text, drop the class. To keep the page current, rewrite
-  the one line under the name and the date above it.
+  The range (the game in the hero) needs no server. The board and the monthly-email signup
+  post to the endpoints in CONFIG below; with both empty they fall back to this browser only.
 -->
 <style>
 :root {
@@ -62,7 +62,7 @@ body {
   .sheet { padding: 32px 48px 72px; }
 }
 
-p, h1, h2, h3, ul, table { margin: 0; }
+p, h1, h2, h3, ul, ol, table { margin: 0; }
 strong { font-weight: 700; }
 
 /* The four cuts. 15 / 18 / 30 / 172. */
@@ -83,9 +83,7 @@ strong { font-weight: 700; }
   max-width: 26em;
 }
 
-.body {
-  max-width: 62ch;
-}
+.body { max-width: 62ch; }
 
 .display {
   font-stretch: 125%;
@@ -111,16 +109,12 @@ a {
   text-decoration-thickness: 1px;
   text-underline-offset: 0.16em;
 }
-a:hover,
-a:active {
+a:hover, a:active {
   background: var(--carbon);
   color: var(--concrete);
   text-decoration: none;
 }
-a:focus-visible {
-  background: var(--carbon);
-  color: var(--concrete);
-  text-decoration: none;
+a:focus-visible, button:focus-visible, input:focus-visible {
   outline: 3px solid var(--carbon);
   outline-offset: 3px;
 }
@@ -135,6 +129,43 @@ a:focus-visible {
   text-underline-offset: 0.2em;
   text-decoration-skip-ink: none;
 }
+
+/* Buttons and inputs are set like the rest of the sheet: no radius, no shadow. */
+
+button, .btn {
+  font: inherit;
+  font-stretch: 62%;
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--concrete);
+  background: var(--carbon);
+  border: 2px solid var(--carbon);
+  padding: 10px 16px;
+  cursor: pointer;
+}
+button.quiet {
+  color: var(--carbon);
+  background: transparent;
+}
+button:hover { background: var(--pen); border-color: var(--pen); color: var(--concrete); }
+button:disabled { opacity: 0.4; cursor: default; }
+
+input {
+  font: inherit;
+  font-size: 17px;
+  color: var(--carbon);
+  background: var(--concrete);
+  border: 0;
+  border-bottom: 2px solid var(--carbon);
+  padding: 8px 0;
+  width: 100%;
+  border-radius: 0;
+}
+input::placeholder { color: var(--ash); }
+label { display: block; }
+label .meta { display: block; margin-bottom: 2px; }
 
 /* Top line */
 
@@ -154,16 +185,11 @@ a:focus-visible {
 
 /* Rules. Each big word hangs from one. */
 
-.masthead,
-section,
-footer {
+.masthead, section, footer {
   border-top: 4px solid var(--carbon);
 }
-.masthead {
-  margin-top: 24px;
-}
-section,
-footer {
+.masthead { margin-top: 24px; }
+section, footer {
   margin-top: clamp(72px, 10vw, 144px);
   scroll-margin-top: 16px;
 }
@@ -173,36 +199,107 @@ section > .display + * {
 
 /* Name block */
 
-.stamp {
-  margin-top: clamp(32px, 4vw, 56px);
+.stamp { margin-top: clamp(32px, 4vw, 56px); }
+.stamp + .lede { margin-top: 10px; }
+.who { margin-top: 24px; }
+
+/* The range: a strip of the sheet where cargo drifts past. Click it. */
+
+.range {
+  margin-top: clamp(28px, 4vw, 48px);
+  border: 2px solid var(--carbon);
+  position: relative;
 }
-.stamp + .lede {
-  margin-top: 10px;
+.range-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 20px;
+  padding: 10px 14px;
+  border-bottom: 2px solid var(--carbon);
 }
-.who {
-  margin-top: 24px;
+.range-bar .readout {
+  display: flex;
+  gap: 18px;
+  font-variant-numeric: tabular-nums;
 }
+.range-bar .readout b { color: var(--carbon); font-weight: 700; }
+.field-wrap { position: relative; background: var(--concrete); }
+#field {
+  display: block;
+  width: 100%;
+  height: clamp(240px, 42vw, 420px);
+  cursor: crosshair;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.field-note {
+  position: absolute;
+  left: 14px;
+  bottom: 12px;
+  pointer-events: none;
+}
+.field-note .display-sm {
+  font-stretch: 125%;
+  font-weight: 900;
+  font-size: clamp(28px, 5vw, 56px);
+  line-height: 0.95;
+  letter-spacing: -0.01em;
+}
+
+/* After the round: the sheet folds over the field. */
+
+.fold {
+  position: absolute;
+  inset: 0;
+  background: var(--concrete);
+  padding: 18px 16px;
+  overflow: auto;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 18px 36px;
+  align-content: start;
+}
+@media (min-width: 840px) {
+  .fold { grid-template-columns: 1.1fr 1fr; padding: 22px 24px; }
+}
+.fold[hidden] { display: none; }
+.fold .score-line { font-stretch: 125%; font-weight: 900; font-size: clamp(34px, 6vw, 72px); line-height: 0.95; }
+.fold form { display: grid; gap: 12px; max-width: 34em; }
+.fold .offer { max-width: 40ch; }
+.fold .actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.fold .done { font-weight: 500; }
+
+/* Board */
+
+.board { list-style: none; padding: 0; counter-reset: rank; }
+.board li {
+  display: grid;
+  grid-template-columns: 2.2em 1fr auto;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 2px solid var(--carbon);
+  font-variant-numeric: tabular-nums;
+  align-items: baseline;
+}
+.board li::before { counter-increment: rank; content: counter(rank); color: var(--ash); font-stretch: 62%; font-weight: 500; }
+.board li.you { color: var(--pen); }
+.board .name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.board .pts { font-weight: 700; }
+.board-wrap { margin-top: 18px; }
+.board-wrap .meta { margin-bottom: 6px; }
 
 /* Now */
 
-.ledger {
-  list-style: none;
-  padding: 0;
-}
-.ledger li {
-  padding: 14px 0;
-  border-bottom: 2px solid var(--carbon);
-}
+.ledger { list-style: none; padding: 0; }
+.ledger li { padding: 14px 0; border-bottom: 2px solid var(--carbon); }
 
 /* Made */
 
-.made {
-  width: 100%;
-  border-collapse: collapse;
-  table-layout: fixed;
-}
-.made th,
-.made td {
+.made { width: 100%; border-collapse: collapse; table-layout: fixed; }
+.made th, .made td {
   text-align: left;
   vertical-align: top;
   border-bottom: 2px solid var(--carbon);
@@ -217,13 +314,8 @@ section > .display + * {
   vertical-align: bottom;
   padding: 0 24px 10px 0;
 }
-.made th:last-child,
-.made td:last-child {
-  padding-right: 0;
-}
-.made .name {
-  font-weight: 700;
-}
+.made th:last-child, .made td:last-child { padding-right: 0; }
+.made .name { font-weight: 700; }
 .made .status {
   font-stretch: 62%;
   font-weight: 500;
@@ -232,51 +324,23 @@ section > .display + * {
   color: var(--ash);
   padding-top: 16px;
 }
-.made .where {
-  overflow-wrap: anywhere;
-}
+.made .where { overflow-wrap: anywhere; }
 
 @media (max-width: 719.98px) {
   .made thead {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    margin: -1px;
-    padding: 0;
-    border: 0;
-    overflow: hidden;
-    clip: rect(0 0 0 0);
-    clip-path: inset(50%);
-    white-space: nowrap;
+    position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; border: 0;
+    overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
   }
-  .made,
-  .made tbody,
-  .made tr,
-  .made td {
-    display: block;
-  }
-  .made tr {
-    padding: 14px 0;
-    border-bottom: 2px solid var(--carbon);
-  }
-  .made td {
-    padding: 0;
-    border: 0;
-  }
-  .made .status {
-    padding-top: 6px;
-  }
-  .made .where {
-    padding-top: 4px;
-  }
+  .made, .made tbody, .made tr, .made td { display: block; }
+  .made tr { padding: 14px 0; border-bottom: 2px solid var(--carbon); }
+  .made td { padding: 0; border: 0; }
+  .made .status { padding-top: 6px; }
+  .made .where { padding-top: 4px; }
 }
 
 /* Notes */
 
-.note {
-  padding: 18px 0 22px;
-  border-bottom: 2px solid var(--carbon);
-}
+.note { padding: 18px 0 22px; border-bottom: 2px solid var(--carbon); }
 .note h3 {
   font-stretch: 100%;
   font-weight: 700;
@@ -285,30 +349,15 @@ section > .display + * {
   max-width: 26em;
   text-wrap: balance;
 }
-.stub {
-  margin-top: 8px;
-  max-width: 62ch;
-  color: var(--ash);
-}
+.stub { margin-top: 8px; max-width: 62ch; color: var(--ash); }
 
 /* Reach */
 
-.contact {
-  overflow-wrap: anywhere;
-}
-.contact a {
-  text-decoration-thickness: 3px;
-  text-underline-offset: 0.12em;
-}
-.contact + .meta {
-  margin-top: 14px;
-}
+.contact { overflow-wrap: anywhere; }
+.contact a { text-decoration-thickness: 3px; text-underline-offset: 0.12em; }
+.contact + .meta { margin-top: 14px; }
 
-/* Footer */
-
-footer {
-  padding-top: 14px;
-}
+footer { padding-top: 14px; }
 </style>
 </head>
 <body>
@@ -317,6 +366,7 @@ footer {
   <header class="topline meta">
     <p>Cyrus Ameri, Honolulu, Hawaii</p>
     <nav aria-label="Index">
+      <a href="#range">Range</a>
       <a href="#now">Now</a>
       <a href="#made">Made</a>
       <a href="#notes">Notes</a>
@@ -328,6 +378,53 @@ footer {
     <h1 class="display">Cyrus Ameri</h1>
     <p class="meta stamp">Updated September 2026</p>
     <p class="lede">Building Copia. Most of it myself, with AI agents and a small team.</p>
+
+    <div class="range" id="range" aria-label="The range: a twenty-second shooting game">
+      <div class="range-bar meta">
+        <div class="readout" aria-live="polite">
+          <span>Score <b id="score">0</b></span>
+          <span>Time <b id="clock">20.0</b></span>
+          <span>Best here <b id="best">0</b></span>
+        </div>
+        <button id="start" type="button">Start the range</button>
+      </div>
+      <div class="field-wrap">
+        <canvas id="field" aria-label="Cargo drifts across the field. Click or tap it before it leaves. Crossed-out cargo costs points."></canvas>
+        <div class="field-note" id="fieldNote">
+          <p class="display-sm">Shoot the cargo.</p>
+          <p class="meta">Twenty seconds. Crates are one point, crossed crates cost two. Fast ones pay double.</p>
+        </div>
+        <div class="fold" id="fold" hidden>
+          <div>
+            <p class="meta">Range closed</p>
+            <p class="score-line"><span id="finalScore">0</span> points</p>
+            <p class="meta" id="rankLine"></p>
+            <form id="signup" novalidate>
+              <p class="offer body">Put your name on the board. You'll get one email a month from me: the best insights and indulgences from what I'm building. Sent from cyrus@copia.co, unsubscribe any time.</p>
+              <label><span class="meta">Username (goes on the board)</span><input name="username" maxlength="16" autocomplete="nickname" required placeholder="handle"></label>
+              <label><span class="meta">Real name</span><input name="realname" maxlength="60" autocomplete="name" placeholder="optional"></label>
+              <label><span class="meta">Email</span><input name="email" type="email" autocomplete="email" required placeholder="you@example.com"></label>
+              <div class="actions">
+                <button type="submit" id="submitBtn">Add me to the board</button>
+                <button type="button" class="quiet" id="again">Shoot again</button>
+                <span class="meta" id="formNote"></span>
+              </div>
+            </form>
+            <p class="done" id="done" hidden></p>
+          </div>
+          <div class="board-wrap">
+            <p class="meta" id="boardTitle">Board</p>
+            <ol class="board" id="board"></ol>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="board-wrap" id="restBoardWrap" hidden>
+      <p class="meta">Board, top ten</p>
+      <ol class="board" id="restBoard"></ol>
+    </div>
+
     <p class="body who">Copia is AI that generates ads and landing pages for direct-to-consumer brands. I founded it and run it. I also run Holy Shilajit, a shilajit shots and resin brand. I live in Honolulu, Hawaii.</p>
   </div>
 
@@ -337,7 +434,7 @@ footer {
       <li><strong>Copia.</strong> Building the product. Ads and landing pages for direct-to-consumer brands.</li>
       <li><strong>Holy Shilajit.</strong> Running the brand. Shilajit shots and resin.</li>
       <li><strong>The Monetization Group.</strong> Winding it down into a few real content sites.</li>
-      <li><strong>Side projects.</strong> A breath-training game, still a concept. Music videos for product launches.</li>
+      <li><strong>Side projects.</strong> A breath-training game, still a concept. Music videos for product launches. The range above.</li>
     </ul>
   </section>
 
@@ -411,14 +508,212 @@ footer {
 
   <section id="reach" aria-labelledby="reach-heading">
     <h2 class="display" id="reach-heading">Reach</h2>
-    <p class="lede contact"><span class="todo">[contact link]</span></p>
+    <p class="lede contact"><a href="mailto:cyrus@copia.co">cyrus@copia.co</a></p>
     <p class="meta">Honolulu, Hawaii (UTC-10)</p>
   </section>
 
   <footer class="meta">
-    <p>Cyrus Ameri, Honolulu, Hawaii, 2026. One HTML file and one font. No scripts, no tracking.</p>
+    <p>Cyrus Ameri, Honolulu, Hawaii, 2026. One HTML file and one font. The range runs in your browser; the board and the signup are the only things that leave it.</p>
   </footer>
 
 </div>
+
+<script>
+(function () {
+  // Endpoints. Empty strings keep everything in this browser.
+  var CONFIG = {
+    hubspotPortal: '',      // e.g. '246671297'
+    hubspotFormId: '',      // form GUID
+    hubspotRegion: 'na2',   // submit host: api-<region>.hsforms.com
+    boardUrl: '',           // JSON: [{username, score}] sorted desc, or a PostgREST endpoint
+    boardKey: ''            // apikey header for the board endpoint, if any
+  };
+
+  var ROUND = 20;
+  var canvas = document.getElementById('field');
+  var ctx = canvas.getContext('2d');
+  var scoreEl = document.getElementById('score'), clockEl = document.getElementById('clock'), bestEl = document.getElementById('best');
+  var startBtn = document.getElementById('start'), note = document.getElementById('fieldNote'), fold = document.getElementById('fold');
+  var finalEl = document.getElementById('finalScore'), rankLine = document.getElementById('rankLine');
+  var form = document.getElementById('signup'), formNote = document.getElementById('formNote'), done = document.getElementById('done'), again = document.getElementById('again'), submitBtn = document.getElementById('submitBtn');
+  var boardEl = document.getElementById('board'), boardTitle = document.getElementById('boardTitle'), restBoard = document.getElementById('restBoard'), restWrap = document.getElementById('restBoardWrap');
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  var state = { running: false, score: 0, t0: 0, left: ROUND, crates: [], hits: [], lastSpawn: 0, w: 0, h: 0, dpr: 1, raf: 0 };
+  var colors = { ink: '#111111', ground: '#F0F0EB', ash: '#5B5B57', pen: '#1E40C8' };
+
+  function size() {
+    var r = canvas.getBoundingClientRect();
+    state.dpr = Math.min(window.devicePixelRatio || 1, 2);
+    state.w = Math.max(1, Math.round(r.width)); state.h = Math.max(1, Math.round(r.height));
+    canvas.width = state.w * state.dpr; canvas.height = state.h * state.dpr;
+    ctx.setTransform(state.dpr, 0, 0, state.dpr, 0, 0);
+    draw();
+  }
+  window.addEventListener('resize', size);
+
+  function local() { try { return JSON.parse(localStorage.getItem('range-board') || '[]'); } catch (e) { return []; } }
+  function saveLocal(list) { try { localStorage.setItem('range-board', JSON.stringify(list.slice(0, 50))); } catch (e) {} }
+  function best() { return local().reduce(function (m, e) { return Math.max(m, e.score || 0); }, 0); }
+
+  function spawn(now) {
+    var fast = Math.random() < 0.22, decoy = !fast && Math.random() < 0.25;
+    var s = fast ? 16 + Math.random() * 8 : 26 + Math.random() * 22;
+    var speed = (fast ? 260 : 110 + Math.random() * 90) * (reduce ? 0.6 : 1);
+    var dir = Math.random() < 0.5 ? 1 : -1;
+    state.crates.push({ x: dir === 1 ? -s : state.w + s, y: 24 + Math.random() * (state.h - s - 60), s: s, vx: speed * dir, vy: (Math.random() - 0.5) * 30, fast: fast, decoy: decoy, born: now });
+  }
+
+  function step(now) {
+    if (!state.running) return;
+    var dt = Math.min(0.05, (now - state.last) / 1000); state.last = now;
+    state.left = Math.max(0, ROUND - (now - state.t0) / 1000);
+    clockEl.textContent = state.left.toFixed(1);
+    var interval = 520 - Math.min(300, (ROUND - state.left) * 14);
+    if (now - state.lastSpawn > interval && state.crates.length < 9) { spawn(now); state.lastSpawn = now; }
+    state.crates.forEach(function (c) { c.x += c.vx * dt; c.y += c.vy * dt; });
+    state.crates = state.crates.filter(function (c) { return c.x > -80 && c.x < state.w + 80; });
+    state.hits = state.hits.filter(function (h) { return now - h.t < 350; });
+    draw(now);
+    if (state.left <= 0) { end(); return; }
+    state.raf = requestAnimationFrame(step);
+  }
+
+  function draw(now) {
+    now = now || 0;
+    ctx.clearRect(0, 0, state.w, state.h);
+    // faint manifest rules across the field
+    ctx.strokeStyle = 'rgba(17,17,17,0.08)'; ctx.lineWidth = 1;
+    for (var y = 28; y < state.h; y += 28) { ctx.beginPath(); ctx.moveTo(0, y + 0.5); ctx.lineTo(state.w, y + 0.5); ctx.stroke(); }
+    state.crates.forEach(function (c) {
+      ctx.fillStyle = c.fast ? colors.pen : colors.ink;
+      ctx.fillRect(c.x - c.s / 2, c.y - c.s / 2, c.s, c.s);
+      if (c.decoy) {
+        ctx.strokeStyle = colors.ground; ctx.lineWidth = 3;
+        ctx.beginPath(); ctx.moveTo(c.x - c.s / 2 + 5, c.y - c.s / 2 + 5); ctx.lineTo(c.x + c.s / 2 - 5, c.y + c.s / 2 - 5);
+        ctx.moveTo(c.x + c.s / 2 - 5, c.y - c.s / 2 + 5); ctx.lineTo(c.x - c.s / 2 + 5, c.y + c.s / 2 - 5); ctx.stroke();
+      }
+    });
+    state.hits.forEach(function (h) {
+      var a = 1 - (now - h.t) / 350;
+      ctx.strokeStyle = h.bad ? 'rgba(91,91,87,' + a + ')' : 'rgba(30,64,200,' + a + ')'; ctx.lineWidth = 2;
+      var r = 10 + (1 - a) * 26;
+      ctx.beginPath(); ctx.arc(h.x, h.y, r, 0, Math.PI * 2); ctx.stroke();
+      ctx.fillStyle = h.bad ? colors.ash : colors.pen; ctx.font = '700 15px Archivo, Helvetica, Arial, sans-serif'; ctx.fillText(h.label, h.x + r + 4, h.y - 4);
+    });
+  }
+
+  function shoot(ev) {
+    if (!state.running) return;
+    ev.preventDefault();
+    var r = canvas.getBoundingClientRect();
+    var p = ev.touches ? ev.touches[0] : ev;
+    var x = p.clientX - r.left, y = p.clientY - r.top, now = performance.now();
+    for (var i = state.crates.length - 1; i >= 0; i--) {
+      var c = state.crates[i], pad = 6;
+      if (x >= c.x - c.s / 2 - pad && x <= c.x + c.s / 2 + pad && y >= c.y - c.s / 2 - pad && y <= c.y + c.s / 2 + pad) {
+        var delta = c.decoy ? -2 : (c.fast ? 2 : 1);
+        state.score = Math.max(0, state.score + delta);
+        state.hits.push({ x: x, y: y, t: now, bad: c.decoy, label: (delta > 0 ? '+' : '') + delta });
+        state.crates.splice(i, 1);
+        scoreEl.textContent = state.score;
+        return;
+      }
+    }
+    state.hits.push({ x: x, y: y, t: now, bad: true, label: '' });
+  }
+  canvas.addEventListener('mousedown', shoot);
+  canvas.addEventListener('touchstart', shoot, { passive: false });
+
+  function start() {
+    fold.hidden = true; note.hidden = true; done.hidden = true; form.hidden = false; formNote.textContent = '';
+    state.running = true; state.score = 0; state.crates = []; state.hits = []; state.t0 = performance.now(); state.last = state.t0; state.lastSpawn = 0; state.left = ROUND;
+    scoreEl.textContent = '0'; clockEl.textContent = ROUND.toFixed(1); startBtn.disabled = true; startBtn.textContent = 'Live';
+    size(); state.raf = requestAnimationFrame(step);
+  }
+  startBtn.addEventListener('click', start);
+  again.addEventListener('click', start);
+
+  function end() {
+    state.running = false; cancelAnimationFrame(state.raf);
+    startBtn.disabled = false; startBtn.textContent = 'Run it again';
+    finalEl.textContent = state.score;
+    var list = local(); list.push({ username: 'you', score: state.score, ts: Date.now(), mine: true }); saveLocal(list);
+    bestEl.textContent = best();
+    fold.hidden = false; renderBoard(boardEl, boardTitle);
+  }
+
+  function rankOf(list, score) { return list.filter(function (e) { return e.score > score; }).length + 1; }
+
+  function renderBoard(el, titleEl) {
+    var list = local().filter(function (e) { return e.username && e.username !== 'you'; });
+    fetchBoard().then(function (remote) {
+      var merged = (remote || []).concat(list).sort(function (a, b) { return b.score - a.score; }).slice(0, 10);
+      el.innerHTML = '';
+      if (!merged.length) { el.innerHTML = '<li><span class="name meta">Nobody on the board yet. Be first.</span><span></span></li>'; }
+      merged.forEach(function (e) {
+        var li = document.createElement('li'); if (e.mine) li.className = 'you';
+        var n = document.createElement('span'); n.className = 'name'; n.textContent = e.username;
+        var p = document.createElement('span'); p.className = 'pts'; p.textContent = e.score;
+        li.appendChild(n); li.appendChild(document.createElement('span')); li.appendChild(p); el.appendChild(li);
+      });
+      if (titleEl) titleEl.textContent = remote ? 'Board, top ten' : 'Board (this browser; the shared board is being wired up)';
+      if (fold.hidden === false) rankLine.textContent = 'That puts you at #' + rankOf(merged.concat([]), state.score) + ' on this board.';
+      if (el === boardEl && merged.length) { restWrap.hidden = false; renderRest(merged); }
+    });
+  }
+  function renderRest(merged) {
+    restBoard.innerHTML = '';
+    merged.forEach(function (e) {
+      var li = document.createElement('li'); var n = document.createElement('span'); n.className = 'name'; n.textContent = e.username;
+      var p = document.createElement('span'); p.className = 'pts'; p.textContent = e.score; li.appendChild(n); li.appendChild(document.createElement('span')); li.appendChild(p); restBoard.appendChild(li);
+    });
+  }
+  function fetchBoard() {
+    if (!CONFIG.boardUrl) return Promise.resolve(null);
+    var h = {}; if (CONFIG.boardKey) { h.apikey = CONFIG.boardKey; h.Authorization = 'Bearer ' + CONFIG.boardKey; }
+    return fetch(CONFIG.boardUrl, { headers: h }).then(function (r) { return r.ok ? r.json() : null; }).then(function (rows) {
+      return Array.isArray(rows) ? rows.map(function (r) { return { username: r.username, score: Number(r.score || r.best_score || 0) }; }) : null;
+    }).catch(function () { return null; });
+  }
+
+  form.addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    var f = new FormData(form), username = String(f.get('username') || '').trim().slice(0, 16), realname = String(f.get('realname') || '').trim(), email = String(f.get('email') || '').trim();
+    if (!username || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { formNote.textContent = 'Username and a real email, please.'; return; }
+    submitBtn.disabled = true; formNote.textContent = 'Adding…';
+    var entry = { username: username, score: state.score, ts: Date.now(), mine: true };
+    var list = local().filter(function (e) { return !e.mine; }); list.push(entry); saveLocal(list);
+    var jobs = [];
+    if (CONFIG.hubspotPortal && CONFIG.hubspotFormId) {
+      var host = CONFIG.hubspotRegion && CONFIG.hubspotRegion !== 'na1' ? 'api-' + CONFIG.hubspotRegion + '.hsforms.com' : 'api.hsforms.com';
+      jobs.push(fetch('https://' + host + '/submissions/v3/integration/submit/' + CONFIG.hubspotPortal + '/' + CONFIG.hubspotFormId, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fields: [
+          { objectTypeId: '0-1', name: 'email', value: email },
+          { objectTypeId: '0-1', name: 'firstname', value: realname },
+          { objectTypeId: '0-1', name: 'game_username', value: username },
+          { objectTypeId: '0-1', name: 'game_best_score', value: String(state.score) }
+        ], context: { pageUri: location.href, pageName: document.title } })
+      }).then(function (r) { if (!r.ok) throw new Error('hubspot ' + r.status); }));
+    }
+    if (CONFIG.boardUrl && CONFIG.boardKey) {
+      jobs.push(fetch(CONFIG.boardUrl, { method: 'POST', headers: { 'Content-Type': 'application/json', apikey: CONFIG.boardKey, Authorization: 'Bearer ' + CONFIG.boardKey, Prefer: 'return=minimal' },
+        body: JSON.stringify({ username: username, real_name: realname, email: email, score: state.score }) }).then(function (r) { if (!r.ok && r.status !== 201) throw new Error('board ' + r.status); }));
+    }
+    Promise.all(jobs).then(function () {
+      form.hidden = true; done.hidden = false;
+      done.textContent = 'On the board as ' + username + '. First email comes from cyrus@copia.co.';
+      renderBoard(boardEl, boardTitle);
+    }).catch(function () {
+      submitBtn.disabled = false; formNote.textContent = 'Saved here, but the signup did not reach the server. Try again in a moment.';
+    });
+  });
+
+  bestEl.textContent = best();
+  size();
+  renderBoard(restBoard, null);
+})();
+</script>
 </body>
 </html>
