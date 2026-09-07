@@ -119,8 +119,6 @@ a:focus-visible, button:focus-visible, input:focus-visible {
   outline-offset: 3px;
 }
 
-/* The one mark for anything not written yet. */
-
 .todo {
   text-decoration-line: underline;
   text-decoration-style: wavy;
@@ -129,8 +127,6 @@ a:focus-visible, button:focus-visible, input:focus-visible {
   text-underline-offset: 0.2em;
   text-decoration-skip-ink: none;
 }
-
-/* Buttons and inputs are set like the rest of the sheet: no radius, no shadow. */
 
 button, .btn {
   font: inherit;
@@ -145,10 +141,7 @@ button, .btn {
   padding: 10px 16px;
   cursor: pointer;
 }
-button.quiet {
-  color: var(--carbon);
-  background: transparent;
-}
+button.quiet { color: var(--carbon); background: transparent; }
 button:hover { background: var(--pen); border-color: var(--pen); color: var(--concrete); }
 button:disabled { opacity: 0.4; cursor: default; }
 
@@ -176,37 +169,21 @@ label .meta { display: block; margin-bottom: 2px; }
   column-gap: 32px;
   row-gap: 6px;
 }
-.topline nav {
-  display: flex;
-  flex-wrap: wrap;
-  column-gap: 24px;
-  row-gap: 6px;
-}
+.topline nav { display: flex; flex-wrap: wrap; column-gap: 24px; row-gap: 6px; }
 
 /* Rules. Each big word hangs from one. */
 
-.masthead, section, footer {
-  border-top: 4px solid var(--carbon);
-}
-.masthead { margin-top: 24px; }
 section, footer {
+  border-top: 4px solid var(--carbon);
   margin-top: clamp(72px, 10vw, 144px);
   scroll-margin-top: 16px;
 }
-section > .display + * {
-  margin-top: clamp(24px, 3vw, 40px);
-}
+section > .display + * { margin-top: clamp(24px, 3vw, 40px); }
 
-/* Name block */
-
-.stamp { margin-top: clamp(32px, 4vw, 56px); }
-.stamp + .lede { margin-top: 10px; }
-.who { margin-top: 24px; }
-
-/* The range: a strip of the sheet where cargo drifts past. Click it. */
+/* The range is the hero. The player stands at the bottom, aims, fires. */
 
 .range {
-  margin-top: clamp(28px, 4vw, 48px);
+  margin-top: 18px;
   border: 2px solid var(--carbon);
   position: relative;
 }
@@ -219,37 +196,33 @@ section > .display + * {
   padding: 10px 14px;
   border-bottom: 2px solid var(--carbon);
 }
-.range-bar .readout {
-  display: flex;
-  gap: 18px;
-  font-variant-numeric: tabular-nums;
-}
+.range-bar .readout { display: flex; gap: 18px; font-variant-numeric: tabular-nums; }
 .range-bar .readout b { color: var(--carbon); font-weight: 700; }
 .field-wrap { position: relative; background: var(--concrete); }
 #field {
   display: block;
   width: 100%;
-  height: clamp(240px, 42vw, 420px);
+  height: clamp(320px, 68vh, 720px);
   cursor: crosshair;
-  touch-action: manipulation;
+  touch-action: none;
   user-select: none;
   -webkit-user-select: none;
 }
 .field-note {
   position: absolute;
   left: 14px;
-  bottom: 12px;
+  top: 14px;
   pointer-events: none;
+  max-width: 34ch;
 }
 .field-note .display-sm {
   font-stretch: 125%;
   font-weight: 900;
-  font-size: clamp(28px, 5vw, 56px);
-  line-height: 0.95;
+  font-size: clamp(34px, 7vw, 96px);
+  line-height: 0.92;
   letter-spacing: -0.01em;
 }
-
-/* After the round: the sheet folds over the field. */
+.field-note .meta { margin-top: 10px; max-width: 34ch; }
 
 .fold {
   position: absolute;
@@ -272,8 +245,6 @@ section > .display + * {
 .fold .actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
 .fold .done { font-weight: 500; }
 
-/* Board */
-
 .board { list-style: none; padding: 0; counter-reset: rank; }
 .board li {
   display: grid;
@@ -291,46 +262,22 @@ section > .display + * {
 .board-wrap { margin-top: 18px; }
 .board-wrap .meta { margin-bottom: 6px; }
 
-/* Now */
+.under { margin-top: 18px; display: grid; gap: 8px; }
 
+/* Now */
 .ledger { list-style: none; padding: 0; }
 .ledger li { padding: 14px 0; border-bottom: 2px solid var(--carbon); }
 
 /* Made */
-
 .made { width: 100%; border-collapse: collapse; table-layout: fixed; }
-.made th, .made td {
-  text-align: left;
-  vertical-align: top;
-  border-bottom: 2px solid var(--carbon);
-  padding: 14px 24px 14px 0;
-}
-.made th {
-  font-stretch: 62%;
-  font-weight: 500;
-  font-size: 15px;
-  line-height: 1.35;
-  color: var(--ash);
-  vertical-align: bottom;
-  padding: 0 24px 10px 0;
-}
+.made th, .made td { text-align: left; vertical-align: top; border-bottom: 2px solid var(--carbon); padding: 14px 24px 14px 0; }
+.made th { font-stretch: 62%; font-weight: 500; font-size: 15px; line-height: 1.35; color: var(--ash); vertical-align: bottom; padding: 0 24px 10px 0; }
 .made th:last-child, .made td:last-child { padding-right: 0; }
 .made .name { font-weight: 700; }
-.made .status {
-  font-stretch: 62%;
-  font-weight: 500;
-  font-size: 15px;
-  line-height: 1.35;
-  color: var(--ash);
-  padding-top: 16px;
-}
+.made .status { font-stretch: 62%; font-weight: 500; font-size: 15px; line-height: 1.35; color: var(--ash); padding-top: 16px; }
 .made .where { overflow-wrap: anywhere; }
-
 @media (max-width: 719.98px) {
-  .made thead {
-    position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; border: 0;
-    overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
-  }
+  .made thead { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; border: 0; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
   .made, .made tbody, .made tr, .made td { display: block; }
   .made tr { padding: 14px 0; border-bottom: 2px solid var(--carbon); }
   .made td { padding: 0; border: 0; }
@@ -339,20 +286,11 @@ section > .display + * {
 }
 
 /* Notes */
-
 .note { padding: 18px 0 22px; border-bottom: 2px solid var(--carbon); }
-.note h3 {
-  font-stretch: 100%;
-  font-weight: 700;
-  font-size: clamp(22px, 2.2vw, 30px);
-  line-height: 1.3;
-  max-width: 26em;
-  text-wrap: balance;
-}
+.note h3 { font-stretch: 100%; font-weight: 700; font-size: clamp(22px, 2.2vw, 30px); line-height: 1.3; max-width: 26em; text-wrap: balance; }
 .stub { margin-top: 8px; max-width: 62ch; color: var(--ash); }
 
 /* Reach */
-
 .contact { overflow-wrap: anywhere; }
 .contact a { text-decoration-thickness: 3px; text-underline-offset: 0.12em; }
 .contact + .meta { margin-top: 14px; }
@@ -374,58 +312,55 @@ footer { padding-top: 14px; }
     </nav>
   </header>
 
-  <div class="masthead">
-    <h1 class="display">Cyrus Ameri</h1>
-    <p class="meta stamp">Updated September 2026</p>
-    <p class="lede">Building Copia. Most of it myself, with AI agents and a small team.</p>
-
-    <div class="range" id="range" aria-label="The range: a twenty-second shooting game">
-      <div class="range-bar meta">
-        <div class="readout" aria-live="polite">
-          <span>Score <b id="score">0</b></span>
-          <span>Time <b id="clock">20.0</b></span>
-          <span>Best here <b id="best">0</b></span>
-        </div>
-        <button id="start" type="button">Start the range</button>
+  <div class="range" id="range" aria-label="The range: a twenty-second shooting game">
+    <div class="range-bar meta">
+      <div class="readout" aria-live="polite">
+        <span>Score <b id="score">0</b></span>
+        <span>Time <b id="clock">20.0</b></span>
+        <span>Best here <b id="best">0</b></span>
       </div>
-      <div class="field-wrap">
-        <canvas id="field" aria-label="Cargo drifts across the field. Click or tap it before it leaves. Crossed-out cargo costs points."></canvas>
-        <div class="field-note" id="fieldNote">
-          <p class="display-sm">Shoot the cargo.</p>
-          <p class="meta">Twenty seconds. Crates are one point, crossed crates cost two. Fast ones pay double.</p>
+      <button id="start" type="button">Start the range</button>
+    </div>
+    <div class="field-wrap">
+      <canvas id="field" aria-label="You stand at the bottom of the field. Aim with the mouse and click to fire at the cargo drifting above. Crossed-out cargo costs points."></canvas>
+      <div class="field-note" id="fieldNote">
+        <p class="display-sm">Shoot the cargo.</p>
+        <p class="meta">You're the square at the bottom. Aim with the mouse, click to fire. On a phone, tap where to shoot. Twenty seconds. Crates are one point, blue ones two, crossed ones cost two.</p>
+      </div>
+      <div class="fold" id="fold" hidden>
+        <div>
+          <p class="meta">Range closed</p>
+          <p class="score-line"><span id="finalScore">0</span> points</p>
+          <p class="meta" id="rankLine"></p>
+          <form id="signup" novalidate>
+            <p class="offer body">Put your name on the board. You'll get one email a month from me: the best insights and indulgences from what I'm building. Sent from cyrus@copia.co, unsubscribe any time.</p>
+            <label><span class="meta">Username (goes on the board)</span><input name="username" maxlength="16" autocomplete="nickname" required placeholder="handle"></label>
+            <label><span class="meta">Real name</span><input name="realname" maxlength="60" autocomplete="name" placeholder="optional"></label>
+            <label><span class="meta">Email</span><input name="email" type="email" autocomplete="email" required placeholder="you@example.com"></label>
+            <div class="actions">
+              <button type="submit" id="submitBtn">Add me to the board</button>
+              <button type="button" class="quiet" id="again">Shoot again</button>
+              <span class="meta" id="formNote"></span>
+            </div>
+          </form>
+          <p class="done" id="done" hidden></p>
         </div>
-        <div class="fold" id="fold" hidden>
-          <div>
-            <p class="meta">Range closed</p>
-            <p class="score-line"><span id="finalScore">0</span> points</p>
-            <p class="meta" id="rankLine"></p>
-            <form id="signup" novalidate>
-              <p class="offer body">Put your name on the board. You'll get one email a month from me: the best insights and indulgences from what I'm building. Sent from cyrus@copia.co, unsubscribe any time.</p>
-              <label><span class="meta">Username (goes on the board)</span><input name="username" maxlength="16" autocomplete="nickname" required placeholder="handle"></label>
-              <label><span class="meta">Real name</span><input name="realname" maxlength="60" autocomplete="name" placeholder="optional"></label>
-              <label><span class="meta">Email</span><input name="email" type="email" autocomplete="email" required placeholder="you@example.com"></label>
-              <div class="actions">
-                <button type="submit" id="submitBtn">Add me to the board</button>
-                <button type="button" class="quiet" id="again">Shoot again</button>
-                <span class="meta" id="formNote"></span>
-              </div>
-            </form>
-            <p class="done" id="done" hidden></p>
-          </div>
-          <div class="board-wrap">
-            <p class="meta" id="boardTitle">Board</p>
-            <ol class="board" id="board"></ol>
-          </div>
+        <div class="board-wrap">
+          <p class="meta" id="boardTitle">Board</p>
+          <ol class="board" id="board"></ol>
         </div>
       </div>
     </div>
+  </div>
 
-    <div class="board-wrap" id="restBoardWrap" hidden>
-      <p class="meta">Board, top ten</p>
-      <ol class="board" id="restBoard"></ol>
-    </div>
+  <div class="under">
+    <p class="meta">Updated September 2026</p>
+    <p class="body">Copia is AI that generates ads and landing pages for direct-to-consumer brands. I founded it and run it. I also run Holy Shilajit, a shilajit shots and resin brand. I live in Honolulu, Hawaii.</p>
+  </div>
 
-    <p class="body who">Copia is AI that generates ads and landing pages for direct-to-consumer brands. I founded it and run it. I also run Holy Shilajit, a shilajit shots and resin brand. I live in Honolulu, Hawaii.</p>
+  <div class="board-wrap" id="restBoardWrap" hidden>
+    <p class="meta">Board, top ten</p>
+    <ol class="board" id="restBoard"></ol>
   </div>
 
   <section id="now" aria-labelledby="now-heading">
@@ -529,7 +464,7 @@ footer { padding-top: 14px; }
     boardKey: ''            // apikey header for the board endpoint, if any
   };
 
-  var ROUND = 20;
+  var ROUND = 20, BULLET_SPEED = 820, FIRE_GAP = 130;
   var canvas = document.getElementById('field');
   var ctx = canvas.getContext('2d');
   var scoreEl = document.getElementById('score'), clockEl = document.getElementById('clock'), bestEl = document.getElementById('best');
@@ -538,9 +473,10 @@ footer { padding-top: 14px; }
   var form = document.getElementById('signup'), formNote = document.getElementById('formNote'), done = document.getElementById('done'), again = document.getElementById('again'), submitBtn = document.getElementById('submitBtn');
   var boardEl = document.getElementById('board'), boardTitle = document.getElementById('boardTitle'), restBoard = document.getElementById('restBoard'), restWrap = document.getElementById('restBoardWrap');
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-  var state = { running: false, score: 0, t0: 0, left: ROUND, crates: [], hits: [], lastSpawn: 0, w: 0, h: 0, dpr: 1, raf: 0 };
   var colors = { ink: '#111111', ground: '#F0F0EB', ash: '#5B5B57', pen: '#1E40C8' };
+
+  var state = { running: false, score: 0, t0: 0, last: 0, left: ROUND, crates: [], bullets: [], hits: [], lastSpawn: 0, lastShot: 0, w: 0, h: 0, dpr: 1, raf: 0,
+    player: { x: 0, y: 0, angle: -Math.PI / 2, size: 26, recoil: 0 }, aim: { x: 0, y: 0, has: false } };
   window.__range = state;
 
   function size() {
@@ -549,7 +485,8 @@ footer { padding-top: 14px; }
     state.w = Math.max(1, Math.round(r.width)); state.h = Math.max(1, Math.round(r.height));
     canvas.width = state.w * state.dpr; canvas.height = state.h * state.dpr;
     ctx.setTransform(state.dpr, 0, 0, state.dpr, 0, 0);
-    draw();
+    state.player.x = state.w / 2; state.player.y = state.h - 34;
+    draw(performance.now());
   }
   window.addEventListener('resize', size);
 
@@ -559,33 +496,73 @@ footer { padding-top: 14px; }
 
   function spawn(now) {
     var fast = Math.random() < 0.22, decoy = !fast && Math.random() < 0.25;
-    var s = fast ? 16 + Math.random() * 8 : 26 + Math.random() * 22;
-    var speed = (fast ? 260 : 110 + Math.random() * 90) * (reduce ? 0.6 : 1);
+    var s = fast ? 18 + Math.random() * 8 : 28 + Math.random() * 22;
+    var speed = (fast ? 240 : 100 + Math.random() * 90) * (reduce ? 0.6 : 1);
     var dir = Math.random() < 0.5 ? 1 : -1;
-    state.crates.push({ x: dir === 1 ? -s : state.w + s, y: 24 + Math.random() * (state.h - s - 60), s: s, vx: speed * dir, vy: (Math.random() - 0.5) * 30, fast: fast, decoy: decoy, born: now });
+    var top = 24, bottom = Math.max(top + 40, state.h * 0.62);
+    state.crates.push({ x: dir === 1 ? -s : state.w + s, y: top + Math.random() * (bottom - top), s: s, vx: speed * dir, vy: (Math.random() - 0.5) * 24, fast: fast, decoy: decoy, born: now });
   }
+
+  function aimAt(clientX, clientY) {
+    var r = canvas.getBoundingClientRect();
+    state.aim.x = clientX - r.left; state.aim.y = clientY - r.top; state.aim.has = true;
+    state.player.angle = Math.atan2(state.aim.y - state.player.y, state.aim.x - state.player.x);
+  }
+
+  function fire(now) {
+    if (!state.running || now - state.lastShot < FIRE_GAP) return;
+    state.lastShot = now; state.player.recoil = 1;
+    var a = state.player.angle, p = state.player;
+    state.bullets.push({ x: p.x + Math.cos(a) * 22, y: p.y + Math.sin(a) * 22, vx: Math.cos(a) * BULLET_SPEED, vy: Math.sin(a) * BULLET_SPEED, born: now });
+    if (state.bullets.length > 14) state.bullets.shift();
+  }
+
+  canvas.addEventListener('mousemove', function (ev) { aimAt(ev.clientX, ev.clientY); if (!state.running) draw(performance.now()); });
+  canvas.addEventListener('mousedown', function (ev) { ev.preventDefault(); aimAt(ev.clientX, ev.clientY); fire(performance.now()); });
+  canvas.addEventListener('touchstart', function (ev) { ev.preventDefault(); var t = ev.touches[0]; aimAt(t.clientX, t.clientY); fire(performance.now()); }, { passive: false });
+  canvas.addEventListener('touchmove', function (ev) { ev.preventDefault(); var t = ev.touches[0]; aimAt(t.clientX, t.clientY); }, { passive: false });
 
   function step(now) {
     if (!state.running) return;
     var dt = Math.min(0.05, (now - state.last) / 1000); state.last = now;
     state.left = Math.max(0, ROUND - (now - state.t0) / 1000);
     clockEl.textContent = state.left.toFixed(1);
-    var interval = 520 - Math.min(300, (ROUND - state.left) * 14);
-    if (now - state.lastSpawn > interval && state.crates.length < 9) { spawn(now); state.lastSpawn = now; }
+    var interval = 480 - Math.min(280, (ROUND - state.left) * 14);
+    if (now - state.lastSpawn > interval && state.crates.length < 10) { spawn(now); state.lastSpawn = now; }
     state.crates.forEach(function (c) { c.x += c.vx * dt; c.y += c.vy * dt; });
     state.crates = state.crates.filter(function (c) { return c.x > -80 && c.x < state.w + 80; });
-    state.hits = state.hits.filter(function (h) { return now - h.t < 350; });
+    state.bullets.forEach(function (b) { b.x += b.vx * dt; b.y += b.vy * dt; });
+    state.bullets = state.bullets.filter(function (b) { return b.x > -10 && b.x < state.w + 10 && b.y > -10 && b.y < state.h + 10; });
+    // bullet vs crate
+    for (var i = state.bullets.length - 1; i >= 0; i--) {
+      var b = state.bullets[i], hit = false;
+      for (var j = state.crates.length - 1; j >= 0; j--) {
+        var c = state.crates[j], half = c.s / 2 + 3;
+        if (b.x >= c.x - half && b.x <= c.x + half && b.y >= c.y - half && b.y <= c.y + half) {
+          var delta = c.decoy ? -2 : (c.fast ? 2 : 1);
+          state.score = Math.max(0, state.score + delta);
+          state.hits.push({ x: c.x, y: c.y, t: now, bad: c.decoy, label: (delta > 0 ? '+' : '') + delta });
+          state.crates.splice(j, 1); hit = true; break;
+        }
+      }
+      if (hit) state.bullets.splice(i, 1);
+    }
+    scoreEl.textContent = state.score;
+    state.player.recoil = Math.max(0, state.player.recoil - dt * 8);
+    state.hits = state.hits.filter(function (h) { return now - h.t < 380; });
     draw(now);
     if (state.left <= 0) { end(); return; }
     state.raf = requestAnimationFrame(step);
   }
 
   function draw(now) {
-    now = now || 0;
     ctx.clearRect(0, 0, state.w, state.h);
-    // faint manifest rules across the field
     ctx.strokeStyle = 'rgba(17,17,17,0.08)'; ctx.lineWidth = 1;
     for (var y = 28; y < state.h; y += 28) { ctx.beginPath(); ctx.moveTo(0, y + 0.5); ctx.lineTo(state.w, y + 0.5); ctx.stroke(); }
+    // the line the player stands on
+    ctx.strokeStyle = colors.ink; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(0, state.h - 12.5); ctx.lineTo(state.w, state.h - 12.5); ctx.stroke();
+    // cargo
     state.crates.forEach(function (c) {
       ctx.fillStyle = c.fast ? colors.pen : colors.ink;
       ctx.fillRect(c.x - c.s / 2, c.y - c.s / 2, c.s, c.s);
@@ -595,40 +572,39 @@ footer { padding-top: 14px; }
         ctx.moveTo(c.x + c.s / 2 - 5, c.y - c.s / 2 + 5); ctx.lineTo(c.x - c.s / 2 + 5, c.y + c.s / 2 - 5); ctx.stroke();
       }
     });
+    // bullets
+    ctx.fillStyle = colors.pen;
+    state.bullets.forEach(function (b) { ctx.beginPath(); ctx.arc(b.x, b.y, 3.5, 0, Math.PI * 2); ctx.fill(); });
+    // hit marks
     state.hits.forEach(function (h) {
-      var a = 1 - (now - h.t) / 350;
+      var a = 1 - (now - h.t) / 380, r = 8 + (1 - a) * 30;
       ctx.strokeStyle = h.bad ? 'rgba(91,91,87,' + a + ')' : 'rgba(30,64,200,' + a + ')'; ctx.lineWidth = 2;
-      var r = 10 + (1 - a) * 26;
       ctx.beginPath(); ctx.arc(h.x, h.y, r, 0, Math.PI * 2); ctx.stroke();
       ctx.fillStyle = h.bad ? colors.ash : colors.pen; ctx.font = '700 15px Archivo, Helvetica, Arial, sans-serif'; ctx.fillText(h.label, h.x + r + 4, h.y - 4);
     });
-  }
-
-  function shoot(ev) {
-    if (!state.running) return;
-    ev.preventDefault();
-    var r = canvas.getBoundingClientRect();
-    var p = ev.touches ? ev.touches[0] : ev;
-    var x = p.clientX - r.left, y = p.clientY - r.top, now = performance.now();
-    for (var i = state.crates.length - 1; i >= 0; i--) {
-      var c = state.crates[i], pad = 6;
-      if (x >= c.x - c.s / 2 - pad && x <= c.x + c.s / 2 + pad && y >= c.y - c.s / 2 - pad && y <= c.y + c.s / 2 + pad) {
-        var delta = c.decoy ? -2 : (c.fast ? 2 : 1);
-        state.score = Math.max(0, state.score + delta);
-        state.hits.push({ x: x, y: y, t: now, bad: c.decoy, label: (delta > 0 ? '+' : '') + delta });
-        state.crates.splice(i, 1);
-        scoreEl.textContent = state.score;
-        return;
-      }
+    // the player: a square that stands on the line, with a barrel that follows the aim
+    var p = state.player, s = p.size, kick = p.recoil * 4;
+    ctx.save();
+    ctx.translate(p.x, p.y);
+    ctx.fillStyle = colors.ink;
+    ctx.fillRect(-s / 2, -s / 2, s, s);
+    ctx.fillStyle = colors.ground; ctx.fillRect(-4, -4, 8, 8);
+    ctx.rotate(p.angle);
+    ctx.fillStyle = colors.ink; ctx.fillRect(s / 2 - 6 - kick, -3, 20, 6);
+    ctx.restore();
+    ctx.fillStyle = colors.ash; ctx.font = '500 13px Archivo, Helvetica, Arial, sans-serif'; ctx.textAlign = 'center'; ctx.fillText('you', p.x, p.y + s / 2 + 15); ctx.textAlign = 'start';
+    // aim reticle
+    if (state.aim.has && state.running) {
+      ctx.strokeStyle = colors.pen; ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.arc(state.aim.x, state.aim.y, 9, 0, Math.PI * 2); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(state.aim.x - 14, state.aim.y); ctx.lineTo(state.aim.x - 4, state.aim.y); ctx.moveTo(state.aim.x + 4, state.aim.y); ctx.lineTo(state.aim.x + 14, state.aim.y);
+      ctx.moveTo(state.aim.x, state.aim.y - 14); ctx.lineTo(state.aim.x, state.aim.y - 4); ctx.moveTo(state.aim.x, state.aim.y + 4); ctx.lineTo(state.aim.x, state.aim.y + 14); ctx.stroke();
     }
-    state.hits.push({ x: x, y: y, t: now, bad: true, label: '' });
   }
-  canvas.addEventListener('mousedown', shoot);
-  canvas.addEventListener('touchstart', shoot, { passive: false });
 
   function start() {
     fold.hidden = true; note.hidden = true; done.hidden = true; form.hidden = false; formNote.textContent = '';
-    state.running = true; state.score = 0; state.crates = []; state.hits = []; state.t0 = performance.now(); state.last = state.t0; state.lastSpawn = 0; state.left = ROUND;
+    state.running = true; state.score = 0; state.crates = []; state.bullets = []; state.hits = []; state.t0 = performance.now(); state.last = state.t0; state.lastSpawn = 0; state.lastShot = 0; state.left = ROUND;
     scoreEl.textContent = '0'; clockEl.textContent = ROUND.toFixed(1); startBtn.disabled = true; startBtn.textContent = 'Live';
     size(); state.raf = requestAnimationFrame(step);
   }
@@ -659,7 +635,7 @@ footer { padding-top: 14px; }
         li.appendChild(n); li.appendChild(document.createElement('span')); li.appendChild(p); el.appendChild(li);
       });
       if (titleEl) titleEl.textContent = remote ? 'Board, top ten' : 'Board (this browser; the shared board is being wired up)';
-      if (fold.hidden === false) rankLine.textContent = 'That puts you at #' + rankOf(merged.concat([]), state.score) + ' on this board.';
+      if (fold.hidden === false) rankLine.textContent = 'That puts you at #' + rankOf(merged, state.score) + ' on this board.';
       if (el === boardEl && merged.length) { restWrap.hidden = false; renderRest(merged); }
     });
   }
