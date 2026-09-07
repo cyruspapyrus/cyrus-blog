@@ -541,6 +541,7 @@ footer { padding-top: 14px; }
 
   var state = { running: false, score: 0, t0: 0, left: ROUND, crates: [], hits: [], lastSpawn: 0, w: 0, h: 0, dpr: 1, raf: 0 };
   var colors = { ink: '#111111', ground: '#F0F0EB', ash: '#5B5B57', pen: '#1E40C8' };
+  window.__range = state;
 
   function size() {
     var r = canvas.getBoundingClientRect();
