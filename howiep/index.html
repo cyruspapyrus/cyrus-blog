@@ -1,0 +1,761 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex, nofollow" />
+<title>Ask Howie P — prototype</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0e0e0c;
+    --panel: #171714;
+    --panel-2: #1f1f1b;
+    --line: #2c2c27;
+    --text: #ecebe6;
+    --muted: #9b9a92;
+    --faint: #6a6962;
+    --accent: #d6fd70;
+    --accent-ink: #16140f;
+    --bot: #1f1f1b;
+    --user: #ecebe6;
+    --user-ink: #16140f;
+    --warn: #f5b84a;
+    --r-sm: 8px;
+    --r-lg: 14px;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--text);
+    font: 15px/1.5 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  button { font: inherit; color: inherit; cursor: pointer; }
+  input, textarea { font: inherit; color: inherit; }
+  a { color: inherit; }
+
+  .app { display: grid; grid-template-columns: 1fr; height: 100dvh; }
+  .app.signed-in { grid-template-columns: 260px 1fr; }
+
+  /* sidebar (signed-in only) */
+  .sidebar { overflow: hidden; border-right: 1px solid var(--line); background: var(--panel);
+    display: flex; flex-direction: column; min-width: 0; }
+  .app:not(.signed-in) .sidebar { display: none; }
+  .side-top { padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+  .btn-new { display: flex; align-items: center; gap: 8px; padding: 9px 12px; border-radius: var(--r-sm);
+    border: 1px solid var(--line); background: transparent; text-align: left; }
+  .btn-new:hover { background: var(--panel-2); }
+  .side-label { font-size: 12px; color: var(--faint); padding: 8px 14px 4px; }
+  .history { flex: 1; overflow-y: auto; padding: 0 8px; }
+  .history button { display: block; width: 100%; text-align: left; padding: 8px 10px; border: 0;
+    background: transparent; border-radius: var(--r-sm); color: var(--muted); font-size: 14px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .history button:hover, .history button.active { background: var(--panel-2); color: var(--text); }
+  .side-foot { border-top: 1px solid var(--line); padding: 12px 14px; display: flex; align-items: center; gap: 10px; }
+  .me-avatar { width: 30px; height: 30px; border-radius: 50%; background: var(--panel-2); border: 1px solid var(--line);
+    display: grid; place-items: center; font-size: 12px; font-weight: 600; }
+  .me-meta { flex: 1; min-width: 0; font-size: 13px; }
+  .me-meta .plan { color: var(--faint); font-size: 12px; }
+  .ghost { border: 0; background: transparent; color: var(--muted); padding: 6px 8px; border-radius: var(--r-sm); font-size: 13px; }
+  .ghost:hover { color: var(--text); background: var(--panel-2); }
+
+  /* main */
+  .main { display: flex; flex-direction: column; min-width: 0; height: 100dvh; }
+  .topbar { display: flex; align-items: center; gap: 12px; padding: 12px 20px; border-bottom: 1px solid var(--line); }
+  .topbar .who { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
+  .avatar { border-radius: 50%; background: var(--accent); color: var(--accent-ink); display: grid; place-items: center;
+    font-weight: 800; letter-spacing: -0.02em; flex-shrink: 0; }
+  .avatar.sm { width: 32px; height: 32px; font-size: 13px; }
+  .avatar.lg { width: 96px; height: 96px; font-size: 34px; }
+  .who .name { font-weight: 700; }
+  .who .sub { color: var(--faint); font-size: 12px; }
+  .pill { font-size: 12px; color: var(--muted); border: 1px solid var(--line); padding: 5px 10px; border-radius: 999px; white-space: nowrap; }
+  .pill.soon { opacity: .6; cursor: not-allowed; }
+  .btn-primary { background: var(--accent); color: var(--accent-ink); border: 0; padding: 9px 16px; border-radius: var(--r-sm); font-weight: 700; font-size: 14px; }
+  .btn-primary:hover { filter: brightness(.95); }
+  .btn-secondary { background: transparent; border: 1px solid var(--line); padding: 9px 16px; border-radius: var(--r-sm); font-weight: 600; font-size: 14px; }
+  .btn-secondary:hover { background: var(--panel-2); }
+
+  .scroll { flex: 1; overflow-y: auto; }
+  .thread { max-width: 760px; margin: 0 auto; padding: 24px 20px 12px; }
+
+  /* hero (empty state) */
+  .hero { text-align: center; padding: 48px 0 24px; }
+  .hero .avatar { margin: 0 auto 18px; }
+  .hero h1 { font-size: 34px; line-height: 1.1; margin: 0 0 8px; letter-spacing: -0.02em; font-weight: 800; }
+  .hero .tag { color: var(--muted); max-width: 520px; margin: 0 auto; }
+  .stats { display: flex; justify-content: center; gap: 28px; margin: 22px 0 6px; flex-wrap: wrap; }
+  .stat b { display: block; font-size: 20px; font-variant-numeric: tabular-nums; }
+  .stat span { font-size: 12px; color: var(--faint); }
+  .chips { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 28px; text-align: left; }
+  .chip { border: 1px solid var(--line); background: var(--panel); border-radius: var(--r-lg); padding: 12px 14px; font-size: 14px; color: var(--text); }
+  .chip:hover { border-color: #45453d; background: var(--panel-2); }
+  .chip small { display: block; color: var(--faint); font-size: 12px; margin-top: 2px; }
+
+  /* messages */
+  .msg { display: flex; gap: 12px; margin: 18px 0; }
+  .msg.user { justify-content: flex-end; }
+  .bubble { max-width: 82%; padding: 12px 16px; border-radius: var(--r-lg); white-space: pre-wrap; word-wrap: break-word; }
+  .msg.bot .bubble { background: var(--bot); border: 1px solid var(--line); border-top-left-radius: 4px; }
+  .msg.user .bubble { background: var(--user); color: var(--user-ink); border-top-right-radius: 4px; }
+  .src { margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--line); font-size: 12px; color: var(--faint); white-space: normal; }
+  .src span { display: inline-block; border: 1px solid var(--line); border-radius: 999px; padding: 2px 8px; margin: 4px 4px 0 0; color: var(--muted); }
+  .msg-actions { display: flex; gap: 2px; margin-top: 6px; }
+  .msg-actions button { border: 0; background: transparent; color: var(--faint); font-size: 12px; padding: 4px 6px; border-radius: 6px; }
+  .msg-actions button:hover { color: var(--text); background: var(--panel-2); }
+  .typing { display: inline-flex; gap: 4px; padding: 4px 0; }
+  .typing i { width: 6px; height: 6px; border-radius: 50%; background: var(--muted); animation: blink 1.2s infinite; }
+  .typing i:nth-child(2) { animation-delay: .2s; } .typing i:nth-child(3) { animation-delay: .4s; }
+  @keyframes blink { 0%, 80%, 100% { opacity: .2 } 40% { opacity: 1 } }
+
+  /* inline gate card */
+  .gate-inline { border: 1px solid var(--line); background: var(--panel); border-radius: var(--r-lg); padding: 18px; margin: 18px 0; text-align: center; }
+  .gate-inline p { margin: 0 0 12px; color: var(--muted); }
+  .gate-inline b { color: var(--text); }
+
+  /* composer */
+  .composer-wrap { padding: 8px 20px 16px; }
+  .composer { max-width: 760px; margin: 0 auto; display: flex; gap: 8px; align-items: flex-end;
+    background: var(--panel); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 8px 8px 8px 14px; }
+  .composer:focus-within { border-color: #55554b; }
+  .composer textarea { flex: 1; resize: none; border: 0; outline: 0; background: transparent; padding: 7px 0; max-height: 160px; line-height: 1.45; }
+  .composer textarea::placeholder { color: var(--faint); }
+  .send { width: 36px; height: 36px; border-radius: var(--r-sm); border: 0; background: var(--accent); color: var(--accent-ink); font-weight: 800; flex-shrink: 0; }
+  .send:disabled { background: var(--panel-2); color: var(--faint); cursor: not-allowed; }
+  .fine { max-width: 760px; margin: 8px auto 0; display: flex; justify-content: space-between; gap: 12px; font-size: 12px; color: var(--faint); flex-wrap: wrap; }
+  .fine .left b { color: var(--warn); font-weight: 600; }
+
+  /* modal */
+  .scrim { position: fixed; inset: 0; background: rgba(0,0,0,.6); display: none; place-items: center; padding: 16px; z-index: 50; }
+  .scrim.open { display: grid; }
+  .modal { width: 100%; max-width: 420px; background: var(--panel); border: 1px solid var(--line); border-radius: var(--r-lg);
+    padding: 28px; position: relative; box-shadow: 0 24px 60px rgba(0,0,0,.5); }
+  .modal .x { position: absolute; top: 12px; right: 12px; }
+  .modal h2 { margin: 12px 0 6px; font-size: 22px; letter-spacing: -0.01em; text-align: center; }
+  .modal .lede { margin: 0 0 20px; color: var(--muted); text-align: center; font-size: 14px; }
+  .modal .avatar { margin: 0 auto; }
+  .sso { display: flex; flex-direction: column; gap: 10px; }
+  .sso button { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 11px; border-radius: var(--r-sm);
+    border: 1px solid var(--line); background: var(--panel-2); font-weight: 600; font-size: 14px; }
+  .sso button:hover { border-color: #45453d; }
+  .or { display: flex; align-items: center; gap: 10px; color: var(--faint); font-size: 12px; margin: 16px 0; }
+  .or::before, .or::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+  .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; text-align: left; }
+  .field label { font-size: 13px; color: var(--muted); }
+  .field input, .field select { width: 100%; padding: 10px 12px; border-radius: var(--r-sm); border: 1px solid var(--line); background: var(--bg); color: var(--text); outline: 0; font: inherit; }
+  .field input:focus, .field select:focus { border-color: #55554b; }
+  .code-row { display: flex; gap: 8px; justify-content: center; margin-bottom: 16px; }
+  .code-row input { width: 44px; height: 52px; text-align: center; font-size: 22px; font-weight: 700; border-radius: var(--r-sm); border: 1px solid var(--line); background: var(--bg); outline: 0; }
+  .code-row input:focus { border-color: var(--accent); }
+  .check { display: flex; gap: 10px; align-items: flex-start; font-size: 13px; color: var(--muted); margin: 6px 0 16px; text-align: left; }
+  .check input { margin-top: 3px; accent-color: var(--accent); }
+  .full { width: 100%; }
+  .legal { font-size: 12px; color: var(--faint); text-align: center; margin-top: 16px; }
+  .err { color: #ff8a7a; font-size: 13px; margin: -4px 0 10px; min-height: 1em; }
+  .goals { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+  .goals button { border: 1px solid var(--line); background: var(--bg); border-radius: var(--r-sm); padding: 9px 10px; font-size: 13px; text-align: left; }
+  .goals button.on { border-color: var(--accent); background: rgba(214,253,112,.08); }
+
+  .proto { position: fixed; top: 74px; right: 10px; z-index: 60; display: flex; gap: 6px; align-items: center;
+    background: #000; border: 1px solid var(--line); border-radius: 999px; padding: 4px 4px 4px 12px; font-size: 11px; color: var(--muted); }
+  .proto button { border: 0; background: var(--panel-2); border-radius: 999px; padding: 4px 10px; font-size: 11px; color: var(--text); }
+
+  @media (max-width: 760px) {
+    .app.signed-in { grid-template-columns: 1fr; }
+    .app.signed-in .sidebar { display: none; }
+    .app.signed-in.drawer .sidebar { display: flex; position: fixed; inset: 0 25% 0 0; z-index: 40; }
+    .chips { grid-template-columns: 1fr; }
+    .hero h1 { font-size: 28px; }
+    .topbar { padding: 10px 16px; }
+    .thread, .composer-wrap { padding-left: 16px; padding-right: 16px; }
+    .hide-sm, .who .sub { display: none; }
+    .stats { gap: 18px; }
+    .stat b { font-size: 17px; }
+    .proto { top: auto; bottom: 8px; right: 8px; }
+    .fine { font-size: 11px; }
+    .bubble { max-width: 92%; }
+  }
+  @media (min-width: 761px) { .menu-btn { display: none; } }
+</style>
+</head>
+<body>
+<div class="app" id="app">
+  <aside class="sidebar" id="sidebar">
+    <div class="side-top">
+      <button class="btn-new" id="newChat">＋ New chat</button>
+    </div>
+    <div class="side-label">Recent</div>
+    <div class="history" id="history"></div>
+    <div class="side-foot">
+      <div class="me-avatar" id="meAvatar">?</div>
+      <div class="me-meta"><div id="meName">—</div><div class="plan">Free · unlimited chat</div></div>
+      <button class="ghost" id="signOut" title="Sign out">Sign out</button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <button class="ghost menu-btn" id="menuBtn" aria-label="Menu">☰</button>
+      <div class="who">
+        <div class="avatar sm">HP</div>
+        <div style="min-width:0">
+          <div class="name">Howie P <span class="pill" style="margin-left:6px;padding:2px 8px">AI</span></div>
+          <div class="sub">Billion Dollar Brand Builder · Building Smile+</div>
+        </div>
+      </div>
+      <span class="pill soon hide-sm" title="Coming soon">📞 Call Howie · soon</span>
+      <button class="btn-secondary hide-sm" id="shareBtn">Share</button>
+      <button class="btn-primary" id="topSignIn">Sign up free</button>
+    </header>
+
+    <div class="scroll" id="scroll">
+      <div class="thread" id="thread"></div>
+    </div>
+
+    <div class="composer-wrap">
+      <form class="composer" id="composer">
+        <textarea id="input" rows="1" placeholder="Ask Howie anything — business, money, mindset, the LOGIC story…"></textarea>
+        <button class="send" id="send" type="submit" aria-label="Send" disabled>↑</button>
+      </form>
+      <div class="fine">
+        <span class="left" id="quota"></span>
+        <span>AI version of Howie, trained on his public content. Not the real Howie. Not financial advice.</span>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- auth modal -->
+<div class="scrim" id="scrim" role="dialog" aria-modal="true">
+  <div class="modal" id="modal"></div>
+</div>
+
+<div class="proto">Mock · scripted answers, fake auth
+  <button id="resetAll">Reset</button>
+</div>
+
+<script>
+/* ------------------------------------------------------------------ *
+ * Ask Howie P — clickable mock. No backend: answers are scripted in   *
+ * HOWIE_REPLIES and auth is simulated. See README.md for the flow and *
+ * PERSONA.md for the voice spec the real model will be given.         *
+ * ------------------------------------------------------------------ */
+
+const FREE_ANON_MESSAGES = 3;
+
+const SUGGESTIONS = [
+  { q: "How did you go from broke to LOGIC?", s: "The origin story" },
+  { q: "How did you hit $100M in 18 months?", s: "Growth" },
+  { q: "What do I do when I'm about to give up?", s: "Mindset" },
+  { q: "How do I market with almost no budget?", s: "Guerrilla marketing" },
+  { q: "How do I get rich?", s: "Money" },
+  { q: "What would you tell your 20-year-old self?", s: "Advice" },
+  { q: "What are you building now?", s: "Smile+" },
+];
+
+// Scripted replies keyed by topic. `k` = keywords that trigger it (matched at
+// word starts). Voice and facts follow PERSONA.md: his real IG captions, plus
+// interviews and press. `src` is the "Drawn from" line under each answer.
+const HOWIE_REPLIES = [
+  {
+    k: ["broke", "story", "start", "origin", "begin", "beginning", "logic", "divorce", "rock bottom", "debt", "rent"],
+    src: ["IG bio", "Podcast: From Broke to Billions", "Authority Magazine interview"],
+    a: `I was fucking broke. Not "tight this month" broke.
+
+$600K in debt. Couldn't make $800 rent. Going through a divorce. Twenty-five years as a trainer and then Lifetime Fitness and Equinox open up around the corner and cut my business in half.
+
+Thirty-nine companies failed before that. THIRTY-NINE.
+
+Then I'm in Beverly Hills for a meeting with the Tapout guys .. totally different deal .. and the guy next to me lights up at the table. I hate cigarettes. I'm about to say something and he tells me it's electronic.
+
+That was the moment.
+
+I built LOGIC out of the back of my gym. $20K to $100M in 18 months. Number one in the US. Sold it to Japan Tobacco in 2015.
+
+The lesson isn't the product. The lesson is the opportunity shows up when you're closest to quitting… you just have to be awake in the room.
+
+What does your rock bottom look like right now?`,
+  },
+  {
+    k: ["scale", "scaled", "100m", "100 million", "grow", "growth", "18 months", "revenue", "distribution", "outwork", "sales team", "selling", "sell more"],
+    src: ["IG reel · Oct 3, 2026", "Authority Magazine interview"],
+    a: `It's not sexy. Nobody wants to hear this part.
+
+140 hours a week. Lanyard around my neck. Store to store to store with LOGIC.
+
+We had a team of 7 going up against companies with thousands of guys .. and we OUTWORKED them. That's the secret. There is no secret.
+
+What actually moved it:
+
+Own one thing. We wanted to be THE brand on the counter. Not one of ten.
+
+Get on the shelf, then fight for the shelf. Distribution is a war and you win it in person.
+
+Every dollar goes back in. Most people scale their expenses before they scale their sales… flip it.
+
+$20K to $100M in 18 months. That's what happens.
+
+What are you selling? Tell me and I'll tell you where I'd start.`,
+  },
+  {
+    k: ["give up", "quit", "quitting", "failing", "failure", "fail", "failed", "hard", "struggle", "depressed", "lost", "tired", "motivat"],
+    src: ["IG reels · Oct 3, 2026", "School of Hard Knocks interview"],
+    a: `Thirty-nine failed companies before LOGIC. I know what quitting feels like from the inside.
+
+So hear me .. you WILL fail. Not if. When.
+
+Some people dream. Some people FKN WORK. Loss after loss after loss… that's the price, and nobody gets to skip it.
+
+When you want to quit, ask yourself one thing: am I done, or am I just tired? Tired you fix with sleep. Done you fix with a new plan, not a new dream.
+
+And get your ass in the gym. At my lowest, the gym is what kept me sane.
+
+Work. Fail. Learn. Repeat. Eventually the receipts show up.
+
+What's going on? Talk to me.`,
+  },
+  {
+    k: ["market", "marketing", "budget", "guerrilla", "ads", "brand", "branding", "advertis", "cheap", "no money", "content", "social media", "views", "followers"],
+    src: ["IG reels · Oct 3, 2026", "Podcast: Billion Dollar Brand Builder"],
+    a: `You don't need money. You need nerve.
+
+LOGIC was guerrilla. Me in the store, shaking the hand, leaving product on the counter. Every single day.
+
+Now? 100M views a month on my page and it's one guy. ONE. No agency, no army.
+
+The playbook:
+
+Be where your customer already is. Don't make them come find you.
+
+Make the product the marketing. If people see it and ask "what is that?" .. you're winning. That's literally how I found e-cigs.
+
+Post every day. I've put up close to 3,000 videos and deleted hundreds. The reps ARE the strategy.
+
+Show up in person. Everybody's hiding behind a screen… walk in.
+
+A brand isn't a logo. It's what people say about you when you leave the room.
+
+What's your product? Give me the one-line pitch.`,
+  },
+  {
+    k: ["think billions", "billions", "mindset", "abundance", "scarcity", "philosophy", "think big"],
+    src: ["Think Billions Experience", "IG reel · Oct 3, 2026"],
+    a: `Think Billions isn't about money. Let me say that first.
+
+Most people live scared. They wake up protecting what they've got, so they play small and never swing.
+
+Thinking billions means you ask "how big can this get?" before you ask "what if it doesn't work?"
+
+And here's the thing about entrepreneurs… we walk into a room and we don't see what's finished. We see what needs fixing. I just built my dream house and I walk around it like a fucking home inspector. 😂 That's not a flaw. That's the engine.
+
+The ideas that scale are the ones that make people's lives better. Enroll people in that and they'll run through walls with you.
+
+So what would you build if you knew you couldn't fail?`,
+  },
+  {
+    k: ["younger", "20-year-old", "20 year old", "advice", "young", "kid", "teen", "college"],
+    src: ["IG reel · Oct 3, 2026", "School of Hard Knocks interview"],
+    a: `Start earlier. Fail faster. Stop waiting for permission.
+
+Everybody wants it handed to them on a silver platter now. That's not how the world works. Nobody's coming.
+
+You figure it out by moving, not by planning.
+
+Protect your health like it's your bank account… because it is.
+
+And pick your circle. The people around you are pulling you toward your future or anchoring you to your past. There's no neutral.
+
+The grind starts today. You with me or what?
+
+How old are you, and what are you working on?`,
+  },
+  {
+    k: ["idea", "business idea", "what business", "start a business", "startup", "which business", "entrepreneur", "side hustle"],
+    src: ["IG reel · Oct 3, 2026", "Podcast interviews"],
+    a: `The best ideas don't come from a whiteboard. They come from paying attention.
+
+LOGIC came from a guy at a table in Beverly Hills. I wasn't looking for it .. I was awake to it.
+
+My filter:
+
+1. Does it make someone's life better? If not, it won't last.
+2. Can you explain it in one sentence?
+3. Will people pay before it's perfect?
+
+Yes to all three? Stop thinking and start selling. Get ten people to pay you before you build anything.
+
+There's no magic trick. No secret members group. It's your balls on the line, every single day.
+
+Tell me what you're thinking about. I'll tell you the truth.`,
+  },
+  {
+    k: ["health", "fitness", "workout", "stealth", "gym", "train", "exercise", "core", "plank", "longevity", "morning"],
+    src: ["Stealth Fitness", "IG reels"],
+    a: `Health is wealth. I'll say it till I'm gone.
+
+I was a trainer for 25 years before I was anything else. That discipline built every company I ever had.
+
+Mondays, Saturdays, holidays… doesn't matter. I just go. Gym first, then work.
+
+That's why I built Stealth. Make fitness a game and people actually do it. Three minutes on the core trainer. No excuses.
+
+Start small. Three minutes a day, every single day. Consistency beats intensity every time.
+
+What does your morning look like?`,
+  },
+  {
+    k: ["sell", "sold", "exit", "japan", "jt", "goldman", "acquisition", "acquire", "billion", "how much", "price"],
+    src: ["Japan Tobacco press release, Apr 2015", "Podcast interviews"],
+    a: `2015. Japan Tobacco bought LOGIC. Goldman Sachs ran the process. All cash.
+
+I'm not getting into the number. Don't ask me again. 😂
+
+What I'll tell you is what made it sellable: number one in the US, real distribution, and a brand that meant something.
+
+Buyers don't buy ideas. They buy proof. Market share, cash flow, a team that runs without you.
+
+Build like you're never going to sell. That's what makes it worth buying.
+
+You building something to sell, or something to keep?`,
+  },
+  {
+    k: ["invest", "investing", "stock", "crypto", "money", "rich", "wealth", "save", "real estate", "millionaire", "ferrari", "supercar"],
+    src: ["IG reels · Oct 3, 2026", "Podcast interviews"],
+    a: `First: I'm the AI version of Howie, and this isn't financial advice. Talk to a pro before you put real money anywhere.
+
+Now .. how do you get rich? Everybody asks me like there's a trick.
+
+There's no trick. Everybody wants it on a silver platter and nobody wants to dig in.
+
+New Year's Eve 2012 I bought my first supercar. Red Ferrari 458 Spider. Thirty-nine failures and LOGIC came before that car. I wasn't broke when I bought it .. I'd already paid the price.
+
+The car wasn't the success. The man I had to become to earn it was.
+
+Make money first. Then protect it. Then grow it. In that order. Most people try to grow money they haven't made yet.
+
+It's so easy to WIN when everybody else is lazy.
+
+What are you doing today to make money?`,
+  },
+];
+
+HOWIE_REPLIES.push({
+  k: ["now", "working on", "smile", "current", "today", "these days", "next", "building", "energy"],
+  src: ["IG bio", "IG reel · Oct 3, 2026", "Smile+"],
+  a: `Smile+. That's where my energy goes right now. @getsmileplus
+
+Here's what I saw: the way everybody gets their energy, the acidic drinks, the sugar .. it's wrecking their mouths and their confidence. Energy has to move past that.
+
+And it's the complete opposite of LOGIC. LOGIC was store to store, counter by counter. Smile+ is direct to consumer. A whole new way of selling.
+
+Same playbook though. Find the habit everybody already has and give them a better version of it.
+
+Gym every day. Posting every day. Building every day. LFG.
+
+What are you building?`,
+});
+
+// Guardrail: always own being the AI version (PERSONA.md › Guardrails).
+HOWIE_REPLIES.push({
+  k: ["really you", "actually you", "are you real", "is this real", "real howie", "is this howie", "are you ai", "are you a bot", "chatbot", "a bot"],
+  src: ["Howie's public content"],
+  a: `Real talk .. I'm the AI version of Howie.
+
+I'm trained on his public stuff. His reels, his interviews, his story. The real Howie isn't sitting here typing this.
+
+But everything I tell you comes from what he's actually said and done. No made-up shit.
+
+Now what do you want to know?`,
+});
+
+const FALLBACK = {
+  src: ["Howie's public content"],
+  a: `Give me more than that. 😂
+
+I want to give you a real answer, not some generic bullshit.
+
+What are you building, where are you stuck, and what have you already tried?
+
+Tell me like we're sitting across the table. Then we go to work.`,
+};
+
+/* ---------------- state ---------------- */
+const store = {
+  get(k, d) { try { const v = localStorage.getItem("howie:" + k); return v ? JSON.parse(v) : d; } catch { return d; } },
+  set(k, v) { try { localStorage.setItem("howie:" + k, JSON.stringify(v)); } catch {} },
+  clear() { try { Object.keys(localStorage).filter(k => k.startsWith("howie:")).forEach(k => localStorage.removeItem(k)); } catch {} },
+};
+
+let state = {
+  user: store.get("user", null),            // { name, email, goal }
+  anonCount: store.get("anonCount", 0),
+  chats: store.get("chats", []),             // [{ id, title, messages: [{role, text, src}] }]
+  activeId: null,
+  busy: false,
+  pendingQuestion: null,
+};
+
+const $ = (id) => document.getElementById(id);
+const thread = $("thread"), input = $("input"), send = $("send"), scroll = $("scroll");
+
+function activeChat() {
+  let c = state.chats.find(c => c.id === state.activeId);
+  if (!c) { c = { id: Date.now().toString(36), title: "New chat", messages: [] }; state.chats.unshift(c); state.activeId = c.id; }
+  return c;
+}
+function persist() { store.set("chats", state.chats); store.set("anonCount", state.anonCount); store.set("user", state.user); }
+function gated() { return !state.user && state.anonCount >= FREE_ANON_MESSAGES; }
+
+/* ---------------- rendering ---------------- */
+function esc(s) { return s.replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
+
+function render() {
+  $("app").classList.toggle("signed-in", !!state.user);
+  $("topSignIn").style.display = state.user ? "none" : "";
+  if (state.user) {
+    $("meName").textContent = state.user.name || state.user.email;
+    $("meAvatar").textContent = (state.user.name || state.user.email || "?").slice(0, 1).toUpperCase();
+  }
+  renderHistory();
+  renderThread();
+  renderQuota();
+}
+
+function renderHistory() {
+  const h = $("history"); h.innerHTML = "";
+  state.chats.filter(c => c.messages.length).forEach(c => {
+    const b = document.createElement("button");
+    b.textContent = c.title; b.className = c.id === state.activeId ? "active" : "";
+    b.onclick = () => { state.activeId = c.id; $("app").classList.remove("drawer"); render(); };
+    h.appendChild(b);
+  });
+}
+
+function renderThread() {
+  const c = state.chats.find(c => c.id === state.activeId);
+  thread.innerHTML = "";
+  if (!c || !c.messages.length) { thread.appendChild(hero()); return; }
+  c.messages.forEach(m => thread.appendChild(bubble(m)));
+  if (gated()) thread.appendChild(gateCard());
+  scroll.scrollTop = scroll.scrollHeight;
+}
+
+function hero() {
+  const d = document.createElement("div"); d.className = "hero";
+  const greet = state.user?.name ? `What's up, ${esc(state.user.name.split(" ")[0])}.` : "Ask me anything.";
+  d.innerHTML = `
+    <div class="avatar lg">HP</div>
+    <h1>${greet}</h1>
+    <p class="tag">I was broke. $600K in debt, couldn't make $800 rent. Thirty-nine failed companies later I built LOGIC to $100M in 18 months and sold it to Japan Tobacco. Ask me about business, sales, mindset, health. I'll tell you the truth.</p>
+    <div class="stats">
+      <div class="stat"><b>−$600K</b><span>where I started</span></div>
+      <div class="stat"><b>39</b><span>failed companies first</span></div>
+      <div class="stat"><b>$100M</b><span>revenue in 18 months</span></div>
+      <div class="stat"><b>790K+</b><span>Instagram followers</span></div>
+    </div>
+    <div class="chips"></div>`;
+  const chips = d.querySelector(".chips");
+  SUGGESTIONS.forEach(s => {
+    const b = document.createElement("button"); b.className = "chip";
+    b.innerHTML = `${esc(s.q)}<small>${esc(s.s)}</small>`;
+    b.onclick = () => ask(s.q);
+    chips.appendChild(b);
+  });
+  return d;
+}
+
+function bubble(m) {
+  const row = document.createElement("div"); row.className = "msg " + m.role;
+  if (m.role === "bot") {
+    row.innerHTML = `<div class="avatar sm">HP</div><div style="min-width:0;max-width:82%"><div class="bubble" style="max-width:100%"></div></div>`;
+    const b = row.querySelector(".bubble");
+    if (m.typing) b.innerHTML = `<span class="typing"><i></i><i></i><i></i></span>`;
+    else {
+      b.textContent = m.text;
+      if (m.src && !m.streaming) {
+        const s = document.createElement("div"); s.className = "src";
+        s.innerHTML = "Drawn from " + m.src.map(x => `<span>${esc(x)}</span>`).join("");
+        b.appendChild(s);
+        const a = document.createElement("div"); a.className = "msg-actions";
+        a.innerHTML = `<button title="Copy">Copy</button><button title="Good answer">👍</button><button title="Not like Howie">👎</button>`;
+        a.firstChild.onclick = () => navigator.clipboard?.writeText(m.text);
+        row.lastChild.appendChild(a);
+      }
+    }
+  } else {
+    row.innerHTML = `<div class="bubble"></div>`;
+    row.querySelector(".bubble").textContent = m.text;
+  }
+  return row;
+}
+
+function gateCard() {
+  const d = document.createElement("div"); d.className = "gate-inline";
+  d.innerHTML = `<p><b>You've used your ${FREE_ANON_MESSAGES} free messages.</b><br>Create a free account to keep talking with Howie. No card, takes 20 seconds.</p>`;
+  const b = document.createElement("button"); b.className = "btn-primary"; b.textContent = "Keep chatting, free";
+  b.onclick = () => openAuth("gate"); d.appendChild(b);
+  return d;
+}
+
+function renderQuota() {
+  const q = $("quota");
+  if (state.user) { q.textContent = ""; return; }
+  const left = Math.max(0, FREE_ANON_MESSAGES - state.anonCount);
+  q.innerHTML = left > 0 ? `${left} free message${left === 1 ? "" : "s"} left · no signup needed` : `<b>Free messages used</b> · sign up free to continue`;
+}
+
+/* ---------------- chat ---------------- */
+function pickReply(q) {
+  const t = q.toLowerCase();
+  let best = null, score = 0;
+  // Word-start match, so "now" doesn't fire on "know" or "car" on "career".
+  const hit = (k) => new RegExp("\\b" + k.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).test(t);
+  for (const r of HOWIE_REPLIES) {
+    const s = r.k.reduce((n, k) => n + (hit(k) ? k.length : 0), 0);
+    if (s > score) { score = s; best = r; }
+  }
+  return best || FALLBACK;
+}
+
+async function ask(text) {
+  text = text.trim();
+  if (!text || state.busy) return;
+  if (gated()) { state.pendingQuestion = text; openAuth("gate"); return; }
+
+  const c = activeChat();
+  if (!c.messages.length) c.title = text.length > 42 ? text.slice(0, 40) + "…" : text;
+  c.messages.push({ role: "user", text });
+  if (!state.user) state.anonCount++;
+  input.value = ""; autosize(); send.disabled = true;
+
+  const bot = { role: "bot", text: "", typing: true };
+  c.messages.push(bot);
+  state.busy = true; render();
+
+  await sleep(700 + Math.random() * 600);
+  const r = pickReply(text);
+  bot.typing = false; bot.streaming = true;
+  const words = r.a.split(/(\s+)/);
+  for (let i = 0; i < words.length; i++) {
+    bot.text += words[i];
+    if (i % 3 === 0) { renderThread(); await sleep(18); }
+  }
+  bot.streaming = false; bot.src = r.src; delete bot.typing;
+  state.busy = false; persist(); render();
+  if (gated()) setTimeout(() => openAuth("gate"), 900);
+}
+
+const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+
+/* ---------------- auth flow (mock) ---------------- */
+let authDraft = {};
+function openAuth(reason) {
+  authDraft = { reason };
+  authStep("start");
+  $("scrim").classList.add("open");
+}
+function closeAuth() { $("scrim").classList.remove("open"); }
+
+function authStep(step) {
+  const m = $("modal");
+  const x = `<button class="ghost x" data-close aria-label="Close">✕</button>`;
+  if (step === "start") {
+    const headline = authDraft.reason === "gate" ? "Keep talking with Howie" : "Chat with Howie, free";
+    m.innerHTML = `${x}
+      <div class="avatar lg" style="width:64px;height:64px;font-size:22px">HP</div>
+      <h2>${headline}</h2>
+      <p class="lede">Free account. Unlimited chat, saved conversations, and Howie remembers what you're building.</p>
+      <div class="sso">
+        <button data-sso="Google"><b style="font-weight:800">G</b> Continue with Google</button>
+        <button data-sso="Apple"> Continue with Apple</button>
+      </div>
+      <div class="or">or</div>
+      <div class="field"><label for="email">Email</label><input id="email" type="email" placeholder="you@example.com" autocomplete="email"></div>
+      <div class="err" id="err"></div>
+      <button class="btn-primary full" id="emailGo">Continue with email</button>
+      <p class="legal">By continuing you agree to the Terms and Privacy Policy. You're chatting with an AI, not the real Howie.</p>`;
+    m.querySelectorAll("[data-sso]").forEach(b => b.onclick = () => {
+      authDraft.email = `demo.user@${b.dataset.sso.toLowerCase()}.com`; authDraft.sso = true; authStep("profile");
+    });
+    $("emailGo").onclick = () => {
+      const e = $("email").value.trim();
+      if (!/^\S+@\S+\.\S+$/.test(e)) { $("err").textContent = "Enter a valid email."; return; }
+      authDraft.email = e; authStep("code");
+    };
+    $("email").onkeydown = (e) => { if (e.key === "Enter") $("emailGo").click(); };
+    setTimeout(() => $("email")?.focus(), 50);
+  }
+  if (step === "code") {
+    m.innerHTML = `${x}
+      <h2>Check your inbox</h2>
+      <p class="lede">We sent a 6-digit code to <b style="color:var(--text)">${esc(authDraft.email)}</b>.<br><span style="color:var(--faint)">(Mock: type any 6 digits.)</span></p>
+      <div class="code-row">${"<input inputmode='numeric' maxlength='1'>".repeat(6)}</div>
+      <div class="err" id="err" style="text-align:center"></div>
+      <button class="btn-primary full" id="codeGo">Verify</button>
+      <p class="legal"><a href="#" id="back">Use a different email</a> · <a href="#" onclick="return false">Resend code</a></p>`;
+    const boxes = [...m.querySelectorAll(".code-row input")];
+    boxes.forEach((b, i) => {
+      b.oninput = () => { b.value = b.value.replace(/\D/g, ""); if (b.value && boxes[i + 1]) boxes[i + 1].focus(); if (boxes.every(x => x.value)) $("codeGo").click(); };
+      b.onkeydown = (e) => { if (e.key === "Backspace" && !b.value && boxes[i - 1]) boxes[i - 1].focus(); };
+    });
+    boxes[0].focus();
+    $("codeGo").onclick = () => {
+      if (!boxes.every(x => x.value)) { $("err").textContent = "Enter all 6 digits."; return; }
+      authStep("profile");
+    };
+    $("back").onclick = (e) => { e.preventDefault(); authStep("start"); };
+  }
+  if (step === "profile") {
+    const goals = ["Starting a business", "Scaling my business", "Marketing & brand", "Mindset & motivation", "Health & fitness", "Just curious"];
+    m.innerHTML = `${x}
+      <h2>One quick thing</h2>
+      <p class="lede">So Howie can actually help, not give generic advice.</p>
+      <div class="field"><label for="nm">First name</label><input id="nm" placeholder="Your name" autocomplete="given-name"></div>
+      <div class="field"><label>What are you here for?</label></div>
+      <div class="goals">${goals.map(g => `<button type="button">${g}</button>`).join("")}</div>
+      <label class="check"><input type="checkbox" id="age"> I'm 18 or older and I understand this is an AI, not the real Howie.</label>
+      <div class="err" id="err"></div>
+      <button class="btn-primary full" id="profGo">Start chatting</button>`;
+    m.querySelectorAll(".goals button").forEach(b => b.onclick = () => {
+      m.querySelectorAll(".goals button").forEach(x => x.classList.remove("on")); b.classList.add("on"); authDraft.goal = b.textContent;
+    });
+    $("nm").focus();
+    $("profGo").onclick = () => {
+      const name = $("nm").value.trim();
+      if (!name) { $("err").textContent = "What should Howie call you?"; return; }
+      if (!$("age").checked) { $("err").textContent = "You need to be 18+ to chat."; return; }
+      state.user = { name, email: authDraft.email, goal: authDraft.goal || null };
+      persist(); closeAuth(); render();
+      welcomeBack();
+    };
+  }
+  m.querySelectorAll("[data-close]").forEach(b => b.onclick = closeAuth);
+}
+
+async function welcomeBack() {
+  const c = activeChat();
+  const first = state.user.name.split(" ")[0];
+  const goalLine = state.user.goal && state.user.goal !== "Just curious"
+    ? ` You're here for ${state.user.goal.toLowerCase()}. Good. That's where I live.`
+    : "";
+  c.messages.push({ role: "bot", text: `${first}! Welcome in.${goalLine}\n\nNo limits now. Ask me whatever you want .. LFG.`, src: null });
+  persist(); render();
+  if (state.pendingQuestion) { const q = state.pendingQuestion; state.pendingQuestion = null; await sleep(400); ask(q); }
+}
+
+/* ---------------- wiring ---------------- */
+function autosize() { input.style.height = "auto"; input.style.height = Math.min(input.scrollHeight, 160) + "px"; }
+input.addEventListener("input", () => { autosize(); send.disabled = !input.value.trim() || state.busy; });
+input.addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); ask(input.value); } });
+$("composer").addEventListener("submit", (e) => { e.preventDefault(); ask(input.value); });
+$("topSignIn").onclick = () => openAuth("top");
+$("newChat").onclick = () => { state.activeId = null; $("app").classList.remove("drawer"); render(); input.focus(); };
+$("signOut").onclick = () => { state.user = null; persist(); render(); };
+$("menuBtn").onclick = () => { if (state.user) $("app").classList.toggle("drawer"); else openAuth("top"); };
+$("shareBtn").onclick = () => { navigator.clipboard?.writeText(location.href); $("shareBtn").textContent = "Link copied"; setTimeout(() => $("shareBtn").textContent = "Share", 1500); };
+$("scrim").addEventListener("click", (e) => { if (e.target.id === "scrim") closeAuth(); });
+document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeAuth(); });
+$("resetAll").onclick = () => { store.clear(); location.reload(); };
+
+state.activeId = state.chats[0]?.id ?? null;
+render();
+</script>
+</body>
+</html>
