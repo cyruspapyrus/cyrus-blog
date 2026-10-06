@@ -110,6 +110,17 @@ button{font:inherit;color:inherit}
 .link-sub{font:400 13px/1.2 var(--sans);color:var(--on-cream-muted)}
 .link-arrow{flex:none;margin-left:auto;color:var(--on-cream-muted)}
 
+/* payment handles sit side by side: shorter labels, no arrow */
+.link-pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.link-sm{gap:12px;padding:12px;min-width:0}
+.link-sm .link-icon{width:40px;height:40px}
+.link-sm .link-sub{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media (max-width:374px){
+  .link-sm{gap:10px;padding:12px 10px}
+  .link-sm .link-icon{width:32px;height:32px;border-radius:10px}
+  .link-sm .link-sub{font-size:12px}
+}
+
 .foot{margin:40px 24px 0;text-align:center;font-size:12px;line-height:1.6;color:var(--faint)}
 .foot p{margin:0}
 .foot p + p{margin-top:6px}
